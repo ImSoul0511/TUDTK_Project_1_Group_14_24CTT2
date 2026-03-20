@@ -16,3 +16,5 @@ __pycache__/
 
 # Sản phẩm đầu ra (Nên chặn để tránh nặng bộ nhớ, chỉ nộp bản cuối)
 # part2/demo_video.mp4
+
+test.py
