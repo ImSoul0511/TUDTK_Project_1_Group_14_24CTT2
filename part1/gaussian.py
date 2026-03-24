@@ -48,7 +48,8 @@ def gaussian_eliminate(A, b):
         
         for i in range(k + 1, row):
             l_ik = M[i][k] / M[k][k]
-            for j in range(k, col):
+            M[i][k] = 0
+            for j in range(k + 1, col):
                 M[i][j] -= l_ik * M[k][j]
 
     U = [row[:-1] for row in M]
@@ -56,6 +57,3 @@ def gaussian_eliminate(A, b):
     x = back_substitution(U, c)
 
     return M, x, s 
-
-
-    
