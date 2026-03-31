@@ -106,15 +106,15 @@ def verify_rank_and_basis(A, rank_custom, row_basis, col_basis, null_basis):
     # Các vector trong row_basis phải độc lập tuyến tính và có số lượng = rank
     check_row = False
     if len(row_basis) == rank_custom:
-        # Hạng của ma trận tạo bởi row_basis phải đúng bằng rank_custom
-        if np.linalg.matrix_rank(np.array(row_basis)) == rank_custom:
+        # Cơ sở dòng tìm được phải có cùng không gian dòng với ma trận A gốc
+        if np.linalg.matrix_rank(np.vstack((A_np, np.array(row_basis)))) == rank_custom:
             check_row = True
 
     # --- 3. Kiểm tra Không gian cột (Column Space) ---
     check_col = False
     if len(col_basis) == rank_custom:
-        # Hạng của ma trận tạo bởi col_basis phải đúng bằng rank_custom
-        if np.linalg.matrix_rank(np.array(col_basis).T) == rank_custom:
+        # Cơ sở cột tìm được phải có cùng không gian cột với ma trận A gốc
+        if np.linalg.matrix_rank(np.hstack((A_np, np.array(col_basis).T))) == rank_custom:
             check_col = True
 
     # --- 4. Kiểm tra Không gian nghiệm (Null Space) ---

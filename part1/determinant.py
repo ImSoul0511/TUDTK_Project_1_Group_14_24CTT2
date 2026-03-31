@@ -13,6 +13,11 @@ def determinant(matrix_A):
     if not matrix_A or not matrix_A[0]:
         return 0.0
     n = len(matrix_A)
+    # Kiểm tra tính vuông của ma trận
+    for row in matrix_A:
+        if len(row) != n:
+            raise ValueError("Ma trận không vuông, không thể tính định thức.")
+            
     M = [row[:] for row in matrix_A]
     det = 1.0
     s = 0
