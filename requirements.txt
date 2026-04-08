@@ -5,7 +5,7 @@ sympy>=1.11.0
 
 # Tạo video
 manim>=0.18.0
-py3cairo>=1.2.0
+pycairo==1.26.1
 
 # Vẽ đồ thị
 matplotlib>=3.7.0
