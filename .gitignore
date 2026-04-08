@@ -2,21 +2,34 @@
 venv/
 ENV/
 env/
+.env
 
 # Python rác
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# IDE (VS Code)
+# IDE
 .vscode/
+.idea/
 
-# Sản phẩm đầu ra (Nên chặn để tránh nặng bộ nhớ, chỉ nộp bản cuối)
-# part2/demo_video.mp4
+# Manim output
+media/
+Tex/
 
+# File tạm và file test
 test.py
+manim_error.txt
+*.mp4
+
+# Tài liệu và hướng dẫn (Dựa trên dự án của bạn)
 part2/lec16.pdf
 part2/householder_qr_explained.md
+TUD-TK*
+*.pdf

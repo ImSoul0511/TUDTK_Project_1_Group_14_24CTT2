@@ -84,7 +84,7 @@ def diagonalize(A):
         D: Ma trận đường chéo chứa các giá trị riêng
     """
     # 1. Tìm giá trị riêng
-    evals = get_eigenvalues(A)
+    evals = get_eigenvalues_with_epsilon(A)
     
     # 2. Tạo ma trận đường chéo D
     n = len(A)
