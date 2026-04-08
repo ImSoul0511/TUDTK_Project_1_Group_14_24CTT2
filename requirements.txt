@@ -1,14 +1,14 @@
 # Kiểm chứng kết quả 
-numpy>=1.24.0
-scipy>=1.10.0
-sympy>=1.11.0
+numpy>=2.4.3
+scipy>=1.17.1
+sympy>=1.14.0
 
 # Tạo video
-manim>=0.18.0
-pycairo==1.26.1
+manim>=0.20.1
+pycairo>=1.29.0
 
 # Vẽ đồ thị
-matplotlib>=3.7.0
+matplotlib>=3.10.8
 
 # Chạy các file ipynb
-ipykernel
+ipykernel>=7.2.0
