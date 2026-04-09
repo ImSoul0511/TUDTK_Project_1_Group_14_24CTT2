@@ -10,9 +10,11 @@ def back_substitution(U, c):
         Vector nghiệm x
     """
     n = len(U)
-    x = [0] * n
-    
+    x = [0.0] * n
     for i in range(n - 1, -1, -1):
+        # Kiểm tra phần tử trên đường chéo chính
+        if abs(U[i][i]) < 1e-12:
+            return None
         x[i] = (c[i] - sum(U[i][j] * x[j] for j in range(i + 1, n))) / U[i][i]
     return x
 
@@ -27,33 +29,124 @@ def gaussian_eliminate(A, b):
     Returns:
         Ma trận sau khi khử, nghiệm x, số lần hoán đổi
     """
+    # Ghép ma trận A và vector b thành ma trận tăng cường M
     M = [row + [b[i]] for i, row in enumerate(A)]
     row = len(M)
     col = len(M[0])
-    max_step = min(row, col - 1)
-    s = 0
-    EPSILON = 1e-12
 
-    for k in range(max_step):
-        p = k 
-        for i in range(k + 1, row):
+    s = 0  # Đếm số lần hoán đổi dòng
+    EPSILON = 1e-12
+    pivot_cols = []   
+    current_row = 0
+
+    for k in range(col-1):
+        if current_row >= row:
+            break
+
+        # Tìm phần tử chốt (trị tuyệt đối lớn nhất) để giảm sai số
+        p = current_row
+        for i in range(current_row + 1, row):
             if abs(M[i][k]) > abs(M[p][k]):
                 p = i
+
         if abs(M[p][k]) < EPSILON: 
-            raise ValueError("Ma trận suy biến")
+            print(f"Không có pivot tại cột {k}")
+            continue
         
-        if p != k:
-            M[k], M[p] = M[p], M[k]
+        if p != current_row:
+            M[current_row], M[p] = M[p], M[current_row]
             s += 1
-        
-        for i in range(k + 1, row):
-            l_ik = M[i][k] / M[k][k]
+        pivot_cols.append(k)
+        for i in range(current_row + 1, row):
+            l_ik = M[i][k] / M[current_row][k]
             M[i][k] = 0
             for j in range(k + 1, col):
-                M[i][j] -= l_ik * M[k][j]
+                M[i][j] -= l_ik * M[current_row][j]
+        current_row += 1
 
-    U = [row[:-1] for row in M]
-    c = [row[-1] for row in M]
+    rank = len(pivot_cols)  #Tính hạng của ma trận
+
+    #Hệ vô nghiệm
+    #Tồn tại dòng có vế trái bằng 0 nhưng vế phải khác 0
+    for i in range(rank, row):
+        if abs(M[i][col-1]) > EPSILON:
+            raise ValueError("Hệ phương trình vô nghiệm.")
+    
+    # Hệ có vô số nghiệm
+    # rank < n (số ẩn): hệ vố số nghiệm
+    if rank < col - 1:
+        free_cols = [j for j in range(col-1) if j not in pivot_cols]
+
+        # 1. Tìm nghiệm riêng x_p (Ngầm định các ẩn tự do = 0)
+        x_p = [0.0] * (col-1)
+        for i in range(rank - 1, -1, -1):
+            p_col = pivot_cols[i]
+
+            #Tính tổng giá trị của tất cả các ẩn số nằm bên phải ẩn chốt hiện tại
+            s_val = sum(M[i][j] * x_p[j] for j in range(p_col + 1, col-1))  
+            # x_chốt = (vế phải - tổng đã chuyển vế) / hệ số chốt
+            x_p[p_col] = (M[i][col-1] - s_val) / M[i][p_col] 
+
+        # 2. Tìm cơ sở không gian nghiệm (Giải hệ thuần nhất Ax = 0, bật lần lượt ẩn tự do = 1)
+        null_basis = []
+        for f in free_cols:
+            v = [0.0] * (col-1)
+            v[f] = 1.0  # Lần lượt cho từng ẩn tự do bằng 1, các ẩn tự do khác bằng 0
+            for i in range(rank - 1, -1, -1):
+                p_col = pivot_cols[i]
+
+                # Tính tổng các ẩn nằm bên phải ẩn chốt hiện tại
+                s_val = sum(M[i][j] * v[j] for j in range(p_col + 1, col-1))
+
+                # Tìm ẩn chốt: x_chốt = -tổng / hệ số chốt (Do 0 - s_val = -s_val)
+                v[p_col] = -s_val / M[i][p_col]
+            null_basis.append(v)
+
+        # 3. Nghiệm tổng quát = Nghiệm riêng + các cơ sở không gian nghiệm (kèm tham số c)
+        formula = f"x = {[round(val, 4) for val in x_p]}"
+        for idx, v in enumerate(null_basis):
+            formula += f" + c{idx+1}*{[round(val, 4) for val in v]}"
+        print("\nHệ có vô số nghiệm, công thức nghiệm tổng quát:")
+        print(formula)
+        return M, formula, s
+    
+    #Hệ có nghiệm duy nhất
+    #rank = n (số ẩn)
+    U = [row[:-1] for row in M[:rank]]
+    c = [row[-1] for row in M[:rank]]
     x = back_substitution(U, c)
 
     return M, x, s 
+
+def verify_solution(A, b, x_custom):
+    """
+    Kiểm chứng kết quả bằng NumPy
+
+    Args:
+        A: Ma trận hệ số
+        b: Vector vế phải
+        x_custom: nghiệm
+    
+    Return:
+        True: Kết quả của bạn Khớp
+        False: Kết quả của bạn Sai
+
+    """
+    import numpy as np
+    # Xử lý kiểm tra cho trường hợp hệ vô số nghiệm / vô nghiệm (x là chuỗi hoặc x = None)
+    if isinstance(x_custom, str) or x_custom is None:
+        try:
+            np.linalg.solve(np.array(A, dtype=float), np.array(b, dtype=float))
+            return False 
+        except (np.linalg.LinAlgError, ValueError):
+            return True 
+        
+    # Dùng numpy để kiểm tra lại trường hợp có nghiệm duy nhất
+    A_np = np.array(A, dtype=float)
+    b_np = np.array(b, dtype=float)
+    x_np = np.array(x_custom, dtype=float)
+
+    # Kiểm tra xem A * x có xấp xỉ bằng b không
+    return np.allclose(np.dot(A_np, x_np), b_np)
+
+

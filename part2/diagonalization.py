@@ -68,6 +68,26 @@ def matrix_sub_lambda_I(A, lam):
         res[i][i] -= lam
     return res
 
+def back_substitution_solve_homo(R):
+    """Giải hệ Rv = 0 với R là ma trận tam giác trên (tìm null space)"""
+    n = len(R)
+    v = [0.0] * n
+    v[n-1] = 1.0  # Giả định tự do cho thành phần cuối
+    
+    for i in range(n - 2, -1, -1):
+        sum_val = 0
+        for j in range(i + 1, n):
+            sum_val += R[i][j] * v[j]
+        
+        if abs(R[i][i]) > config.EPSILON:
+            v[i] = -sum_val / R[i][i]
+        else:
+            v[i] = 0.0 # Trường hợp phụ thuộc tuyến tính
+            
+    # Chuẩn hóa vector riêng
+    norm = ut.vector_norm(v)
+    return [x / norm for x in v]
+
 def eigen_decomposition_with_qr(A, max_iterations=100):
     Ak = ut.copy_matrix(A)
     n = len(Ak)
@@ -97,26 +117,6 @@ def eigen_decomposition_with_qr(A, max_iterations=100):
     
     P_matrix = [[P[j][i] for j in range(n)] for i in range(n)]
     return eigenvalues, P_matrix
-
-def back_substitution_solve_homo(R):
-    """Giải hệ Rv = 0 với R là ma trận tam giác trên (tìm null space)"""
-    n = len(R)
-    v = [0.0] * n
-    v[n-1] = 1.0  # Giả định tự do cho thành phần cuối
-    
-    for i in range(n - 2, -1, -1):
-        sum_val = 0
-        for j in range(i + 1, n):
-            sum_val += R[i][j] * v[j]
-        
-        if abs(R[i][i]) > config.EPSILON:
-            v[i] = -sum_val / R[i][i]
-        else:
-            v[i] = 0.0 # Trường hợp phụ thuộc tuyến tính
-            
-    # Chuẩn hóa vector riêng
-    norm = ut.vector_norm(v)
-    return [x / norm for x in v]
 
 def diagonalize(A):
     """
