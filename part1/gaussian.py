@@ -1,3 +1,7 @@
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import config
+
 def back_substitution(U, c):
     """
     Thực hiện phép thế ngược để giải hệ tam giác trên
@@ -13,7 +17,7 @@ def back_substitution(U, c):
     x = [0.0] * n
     for i in range(n - 1, -1, -1):
         # Kiểm tra phần tử trên đường chéo chính
-        if abs(U[i][i]) < 1e-12:
+        if abs(U[i][i]) < config.EPSILON:
             return None
         x[i] = (c[i] - sum(U[i][j] * x[j] for j in range(i + 1, n))) / U[i][i]
     return x
@@ -35,7 +39,6 @@ def gaussian_eliminate(A, b):
     col = len(M[0])
 
     s = 0  # Đếm số lần hoán đổi dòng
-    EPSILON = 1e-12
     pivot_cols = []   
     current_row = 0
 
@@ -49,7 +52,7 @@ def gaussian_eliminate(A, b):
             if abs(M[i][k]) > abs(M[p][k]):
                 p = i
 
-        if abs(M[p][k]) < EPSILON: 
+        if config.is_zero(M[p][k]): 
             print(f"Không có pivot tại cột {k}")
             continue
         
@@ -69,7 +72,7 @@ def gaussian_eliminate(A, b):
     #Hệ vô nghiệm
     #Tồn tại dòng có vế trái bằng 0 nhưng vế phải khác 0
     for i in range(rank, row):
-        if abs(M[i][col-1]) > EPSILON:
+        if not config.is_zero(M[i][col-1]):
             raise ValueError("Hệ phương trình vô nghiệm.")
     
     # Hệ có vô số nghiệm
