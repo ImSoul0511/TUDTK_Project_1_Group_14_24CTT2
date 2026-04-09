@@ -63,10 +63,18 @@ def svd(A):
     # Bước 5: Tạo ma trận Sigma (đường chéo)
     # (Trả về danh sách sigmas để tiết kiệm bộ nhớ, dễ dàng tạo ma trận sau)
     
-    return ut.matrix_transpose(U), sigmas, ut.matrix_transpose(V)
+    return ut.matrix_transpose(U), ut.diag(sigmas), ut.matrix_transpose(V)
+
+def verify_svd(A):
+    import numpy as np
+    A_np = np.array(A, dtype=float)
+    U, s, Vt = np.linalg.svd(A_np)
+    m, n = A_np.shape
+    Sigma = np.diag(s)
+    return U, Sigma, Vt
 
 # --- TÁI TẠO MA TRẬN TỪ KẾT QUẢ PHÂN RÃ ---
-def rebuild_matrix(U_mtx, sigmas, Vt_mtx, m, n):
+def rebuild_matrix(U_mtx, sigmas, Vt_mtx):
     """ Tái tạo ma trận A từ kết quả phân rã SVD """
     # k là số lượng trị kỳ dị thực tế tìm được (ví dụ k=2)
     k = len(sigmas)
@@ -110,6 +118,8 @@ def householder_qr_v1(A):
         R: Ma trận tam giác trên kích thước m x n
     """
     m = len(A)
+    if m == 0:
+        return [], []
     n = len(A[0])
     Q = ut.identity_matrix(m)
     R = ut.copy_matrix(A)
@@ -168,4 +178,10 @@ def householder_qr_v1(A):
             for col in range(len(w)):
                 Q[row][j + col] -= Q_w[row] * (w[col] * tau)
     
+    return Q, R
+
+def verify_qr(A):
+    import numpy as np
+    A_np = np.array(A, dtype=float)
+    Q, R = np.linalg.qr(A_np)
     return Q, R

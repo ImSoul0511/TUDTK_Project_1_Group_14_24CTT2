@@ -10,7 +10,10 @@ def matrix_transpose(A):
 def matrix_multiply(A, B):
     """ Nhân hai ma trận """
     # Kiểm tra điều kiện nhân ma trận: cột A = hàng B
-    m, n, p = len(A), len(A[0]), len(B[0])
+    try:
+        m, n, p = len(A), len(A[0]), len(B[0])
+    except:
+        raise ValueError("Ma trận A hoặc B không hợp lệ")
     if n != len(B):
         raise ValueError("Số cột của ma trận A phải bằng số hàng của ma trận B")
     result = [[0.0] * p for _ in range(m)]
@@ -67,3 +70,66 @@ def copy_matrix(M):
         Ma trận copy
     """
     return [row[:] for row in M]
+
+def matrix_inverse(A):
+    """
+    Tính ma trận nghịch đảo của ma trận vuông A
+    
+    Args:
+        A: Ma trận vuông cần tính nghịch đảo
+    
+    Returns:
+        Ma trận nghịch đảo của A
+    """
+    n = len(A)
+    if n == 0:
+        return []
+    if n != len(A[0]):
+        raise ValueError("Ma trận phải là ma trận vuông")
+    
+    # Tạo ma trận mở rộng [A | I]
+    aug = [row[:] + [1.0 if i == j else 0.0 for j in range(n)] for i, row in enumerate(A)]
+    
+    # Thực hiện phép biến đổi Gauss-Jordan
+    for i in range(n):
+        # Tìm pivot
+        pivot = i
+        for j in range(i + 1, n):
+            if abs(aug[j][i]) > abs(aug[pivot][i]):
+                pivot = j
+        
+        # Hoán đổi dòng
+        aug[i], aug[pivot] = aug[pivot], aug[i]
+        
+        # Kiểm tra ma trận không khả nghịch
+        if config.is_zero(aug[i][i]):
+            raise ValueError("Ma trận không khả nghịch")
+        
+        # Chuẩn hóa dòng pivot
+        pivot_val = aug[i][i]
+        for j in range(2 * n):
+            aug[i][j] /= pivot_val
+        
+        # Triệt tiêu các phần tử khác trong cột pivot
+        for j in range(n):
+            if i != j:
+                factor = aug[j][i]
+                for k in range(2 * n):
+                    aug[j][k] -= factor * aug[i][k]
+    
+    # Trích xuất ma trận nghịch đảo
+    inv_A = [row[n:] for row in aug]
+    return inv_A
+
+def diag(s):
+    """
+    Tạo ma trận đường chéo từ vector s
+    
+    Args:
+        s: Vector chứa các phần tử trên đường chéo
+    
+    Returns:
+        Ma trận đường chéo
+    """
+    n = len(s)
+    return [[s[i] if i == j else 0.0 for j in range(n)] for i in range(n)]
