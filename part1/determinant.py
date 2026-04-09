@@ -1,3 +1,7 @@
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import config
+
 def determinant(matrix_A):
     """
     Tính định thức của ma trận qua khử Gauss
@@ -21,7 +25,6 @@ def determinant(matrix_A):
     M = [row[:] for row in matrix_A]
     det = 1.0
     s = 0
-    EPSILON = 1e-12
 
     for i in range(n):
         # 1. Tìm phần tử chốt (pivot) lớn nhất trên cột i
@@ -33,7 +36,7 @@ def determinant(matrix_A):
                 pivot_row = k
         
         # 2. Báo lỗi nếu cột toàn số 0 (ma trận suy biến)
-        if max_val < EPSILON:
+        if config.is_zero(max_val):
             print(f"không có pivot tại cột {i}")
             return 0.0
             

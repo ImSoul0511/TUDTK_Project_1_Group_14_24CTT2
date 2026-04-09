@@ -1,3 +1,7 @@
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import config
+
 def rank_and_basis(matrix_A):
     """
     Tính hạng và tìm cơ sở của không gian dòng, không gian cột, 
@@ -21,7 +25,6 @@ def rank_and_basis(matrix_A):
 
     # 2. Tạo ma trận M để khử Gauss-Jordan về RREF
     M = [[val for val in row] for row in matrix_A]
-    EPSILON = 1e-12 # Ngưỡng để kiểm tra số 0, tránh sai số float
     pivot_row = 0
     pivot_cols = []
 
@@ -35,7 +38,7 @@ def rank_and_basis(matrix_A):
             if abs(M[i][j]) > abs(M[max_row][j]):
                 max_row = i
 
-        if abs(M[max_row][j]) < EPSILON:
+        if config.is_zero(M[max_row][j]):
             print(f"Không có pivot tại cột {j}")
             continue
 

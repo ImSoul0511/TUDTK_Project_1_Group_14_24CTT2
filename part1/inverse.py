@@ -1,3 +1,7 @@
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import config
+
 def inverse(matrix_A):
     """
     Tính ma trận nghịch đảo A^-1 bằng phương pháp Gauss-Jordan có Partial Pivoting.
@@ -21,7 +25,6 @@ def inverse(matrix_A):
         row_I=[1.0 if i==j else 0.0 for j in range(n) ]
         M.append(row_A + row_I)
 
-    EPSILON = 1e-12 # Ngưỡng để kiểm tra số 0, tránh sai số float
     # 3. Quá trình khử Gauss-Jordan
     for k in range(n):
         #a. Tìm dòng p có phần tử chốt lớn nhất từ dòng k trở xuống
@@ -29,7 +32,7 @@ def inverse(matrix_A):
         for i in range(k + 1, n):
             if abs(M[i][k]) > abs(M[p][k]):
                 p=i
-        if abs(M[p][k]) < EPSILON:
+        if config.is_zero(M[p][k]):
             print(f"Không có pivot tại cột {k}")
             return None
         # b. Hoán đổi dòng p và dòng k nếu cần
@@ -67,7 +70,7 @@ def verify_inverse(matrix_A, inverse_A):
     # Kiểm tra xem inverse_A có tồn tại không (tránh lỗi khi hàm inverse tạch)
     if inverse_A is None:
         det_A = np.linalg.det(np.array(matrix_A, dtype=float))
-        if abs(det_A) < 1e-9: 
+        if config.is_zero(det_A): 
             return True 
         else:
             return False 
@@ -92,12 +95,12 @@ def verify_inverse(matrix_A, inverse_A):
     I_matrix = np.eye(n)
     
     # Kiểm tra xem tích có xấp xỉ ma trận đơn vị không
-    is_identity = np.allclose(identity_check, I_matrix, atol=1e-8)
+    is_identity = np.allclose(identity_check, I_matrix, atol=config.EPSILON)
 
     # 2. So sánh trực tiếp với kết quả của NumPy
     try:
         inv_numpy = np.linalg.inv(A_np)
-        matches_numpy = np.allclose(inv_custom_np, inv_numpy, atol=1e-8)
+        matches_numpy = np.allclose(inv_custom_np, inv_numpy, atol=config.EPSILON)
     except np.linalg.LinAlgError:
         matches_numpy = False
 
