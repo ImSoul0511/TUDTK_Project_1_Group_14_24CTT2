@@ -27,6 +27,18 @@ def vector_norm(v):
     """ Tính độ dài Euclid của vector """
     return math.sqrt(sum(x**2 for x in v))
 
+def dot_product(v1, v2):
+    """
+    Tính tích vô hướng của hai vector
+    """
+    return sum(x * y for x, y in zip(v1, v2))
+
+def subtract_vectors(v1, v2, scalar):
+    """
+    Trừ hai vector: v1 - (scalar * v2)
+    """ 
+    return [x - (scalar * y) for x, y in zip(v1, v2)]
+
 def vector_normalize(v):
     """ Chuẩn hóa vector """
     norm = vector_norm(v)
@@ -46,6 +58,33 @@ def get_col_slice(M, j, start_row):
         Vector v
     """
     return [M[i][j] for i in range(start_row, len(M))]
+
+def find_orthogonal_u(existing_vectors, dim):
+    """
+    Tìm vector trực giao với tất cả các vector trong existing_vectors
+    theo thuật toán Gram-Schmidt
+    """
+    # Thử lần lượt các vector đơn vị chuẩn: [1, 0, 0...], [0, 1, 0...]
+    for i in range(dim):
+        # 1. Tạo vector đơn vị chuẩn e_i
+        v = [0.0] * dim
+        v[i] = 1.0
+        
+        # 2. Quá trình Gram-Schmidt
+        v_projected = v[:]
+        for u in existing_vectors:
+            # Tính hệ số chiếu: (v . u) / (u . u)
+            # Vì u đã là vector đơn vị nên u.u = 1
+            projection_scalar = dot_product(v, u)
+            v_projected = subtract_vectors(v_projected, u, projection_scalar)
+            
+        # 3. Kiểm tra độ dài vector còn lại
+        mag = vector_norm(v_projected)
+        if mag > 1e-10: 
+            # Chuẩn hóa để trả về vector đơn vị
+            return [x / mag for x in v_projected]
+            
+    return None
 
 def identity_matrix(n):
     """
