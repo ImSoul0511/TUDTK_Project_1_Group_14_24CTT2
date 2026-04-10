@@ -58,7 +58,13 @@ def svd(A):
             U.append(ut.vector_normalize(u_i))
         else:
             # Nếu sigma = 0, cần tìm vector trực giao với các u trước đó
-            U.append([0.0] * len(A)) # Đơn giản hóa
+            new_u = ut.find_orthogonal_u(U, len(A))
+            U.append(new_u)
+
+    # Nếu số chiều của U nhỏ hơn số hàng của A, cần tìm thêm vector trực giao
+    while len(U) < len(A):
+        new_u = ut.find_orthogonal_u(U, len(A))
+        U.append(new_u)
 
     # Bước 5: Tạo ma trận Sigma (đường chéo)
     # (Trả về danh sách sigmas để tiết kiệm bộ nhớ, dễ dàng tạo ma trận sau)
