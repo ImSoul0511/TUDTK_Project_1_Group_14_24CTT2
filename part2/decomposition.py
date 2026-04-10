@@ -1,8 +1,6 @@
 import math
-import utils as ut
-from diagonalization import eigen_decomposition
-import sys, os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from . import utils as ut
+from .diagonalization import eigen_decomposition
 import config
 
 def svd(A):
@@ -66,10 +64,13 @@ def svd(A):
         new_u = ut.find_orthogonal_u(U, len(A))
         U.append(new_u)
 
-    # Bước 5: Tạo ma trận Sigma (đường chéo)
-    # (Trả về danh sách sigmas để tiết kiệm bộ nhớ, dễ dàng tạo ma trận sau)
+    # Bước 5: Tạo ma trận Sigma (kích thước m x n)
+    m, n = len(A), len(A[0])
+    Sigma = [[0.0] * n for _ in range(m)]
+    for i in range(min(m, n)):
+        Sigma[i][i] = sigmas[i]
     
-    return ut.matrix_transpose(U), ut.diag(sigmas), ut.matrix_transpose(V)
+    return ut.matrix_transpose(U), Sigma, ut.matrix_transpose(V)
 
 def verify_svd(A):
     import numpy as np

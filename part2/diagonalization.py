@@ -1,7 +1,5 @@
 import math
-import utils as ut
-import sys, os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from . import utils as ut
 import config
 
 # Dùng thuật toán Jacobi để tìm toàn bộ vector riêng 
@@ -130,7 +128,7 @@ def get_null_space(A):
     return null_basis
 
 def eigen_decomposition_with_qr(A, max_iterations=500):
-    from decomposition import householder_qr_v1
+    from .decomposition import householder_qr_v1
     Ak = ut.copy_matrix(A)
     n = len(Ak)
     
