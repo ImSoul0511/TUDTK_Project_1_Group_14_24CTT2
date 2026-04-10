@@ -52,7 +52,7 @@ def svd(A):
     # Sử dụng công thức liên hệ: u_i = (1 / sigma_i) * A * v_i
     U = []
     for i in range(len(sigmas)):
-        if sigmas[i] > config.EPSILON: # Chỉ tính nếu giá trị kỳ dị đủ lớn (tránh nhiễu)
+        if not config.is_zero(sigmas[i]): # Chỉ tính nếu giá trị kỳ dị đủ lớn (tránh nhiễu)
             v_i = [V[row][i] for row in range(len(V))]
             u_i = [sum(A[r][c] * v_i[c] for c in range(len(v_i))) for r in range(len(A))]
             U.append(ut.vector_normalize(u_i))
