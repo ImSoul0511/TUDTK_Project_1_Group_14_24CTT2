@@ -1,5 +1,3 @@
-import sys, os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import config
 
 def back_substitution(U, c):

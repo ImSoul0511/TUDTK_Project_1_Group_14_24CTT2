@@ -1,15 +1,7 @@
 from manim import *
 import numpy as np
-import sys
-import os
-
-# Add the current directory to sys.path
-current_dir = os.path.dirname(os.path.abspath(__file__))
-if current_dir not in sys.path:
-    sys.path.append(current_dir)
-
-from decomposition import householder_qr_v1
-from diagonalization import diagonalize
+from .decomposition import householder_qr_v1
+from .diagonalization import diagonalize
 
 def get_text_table(data):
     # Create a 2D list of Text objects

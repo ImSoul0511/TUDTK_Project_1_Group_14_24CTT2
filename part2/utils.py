@@ -1,6 +1,4 @@
 import math
-import sys, os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import config
 
 def matrix_transpose(A):
@@ -159,16 +157,3 @@ def matrix_inverse(A):
     # Trích xuất ma trận nghịch đảo
     inv_A = [row[n:] for row in aug]
     return inv_A
-
-def diag(s):
-    """
-    Tạo ma trận đường chéo từ vector s
-    
-    Args:
-        s: Vector chứa các phần tử trên đường chéo
-    
-    Returns:
-        Ma trận đường chéo
-    """
-    n = len(s)
-    return [[s[i] if i == j else 0.0 for j in range(n)] for i in range(n)]
