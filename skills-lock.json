@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "manim": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "0748c431216ccad4cff36ec63006e4ed1757b58c25b18373a255840c06c4b6bc"
+    }
+  }
+}
