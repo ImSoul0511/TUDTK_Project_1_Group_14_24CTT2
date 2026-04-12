@@ -157,3 +157,18 @@ def matrix_inverse(A):
     # Trích xuất ma trận nghịch đảo
     inv_A = [row[n:] for row in aug]
     return inv_A
+
+def orthogonal_matrix(eigenvectors):
+    """
+    Tạo ma trận trực giao từ các vector riêng
+    
+    Args:
+        eigenvectors: Danh sách các vector riêng
+    
+    Returns:
+        Ma trận trực giao Q
+    """
+    Q = []
+    for v in eigenvectors:
+        Q.append(vector_normalize(v))
+    return Q 
