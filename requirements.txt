@@ -12,3 +12,6 @@ matplotlib>=3.10.8
 
 # Chạy các file ipynb
 ipykernel>=7.2.0
+
+#Hỗ trợ xuất ma trận
+pandas>=2.2.0

@@ -1,6 +1,8 @@
 import sys, os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import config
+from config import AutoTestReporter
+from verification import verify_inverse_numpy as verify_inverse
 
 def inverse(matrix_A):
     """
@@ -54,55 +56,47 @@ def inverse(matrix_A):
         inverse_matrix.append(M[i][n:])
     return inverse_matrix
 
-def verify_inverse(matrix_A, inverse_A):
-    """
-    Kiểm chứng AA^-1 = I và so sánh kết quả với NumPy.
 
-    Args:
-        matrix_A: Ma trận hệ số
-        inverse_A: Ma trận nghịch đảo
+def verify_test_inverse(test_cases: list[dict]):
+    import warnings
+    warnings.simplefilter("ignore", UserWarning)
     
-    Returns:
-        True: Nếu tích AA^{-1} ra đúng ma trận đơn vị
-        False: Nếu tích ra sai
-    """
-    import numpy as np
-    # Kiểm tra xem inverse_A có tồn tại không (tránh lỗi khi hàm inverse tạch)
-    if inverse_A is None:
-        det_A = np.linalg.det(np.array(matrix_A, dtype=float))
-        if config.is_zero(det_A): 
-            return True 
-        else:
-            return False 
-        
-    # 1. Kiểm tra kích thước trước khi tính toán để tránh lỗi Broadcast
-    rows_A = len(matrix_A)
-    cols_A = len(matrix_A[0])
-    rows_inv = len(inverse_A)
-    cols_inv = len(inverse_A[0])
+    # Hàm chạy các bộ test cho thuật toán tìm ma trận nghịch đảo
+    AutoTestReporter.print_suite_header("Ma Trận Nghịch Đảo (Inverse)")
+    passed_count = 0
+    total_count = len(test_cases)
 
-    # Ma trận nghịch đảo phải vuông và cùng kích thước với ma trận gốc
-    if rows_A != cols_A or rows_inv != cols_inv or rows_A != rows_inv:
-        return False
-    
-    A_np = np.array(matrix_A, dtype=float)
-    inv_custom_np = np.array(inverse_A, dtype=float)
-    n = len(matrix_A)
+    for case in test_cases:
+        try:
+            inv_A = inverse(case["input"])
+            if case.get("should_raise"):
+                AutoTestReporter.print_result(case['name'], False, "Lẽ ra phải phát sinh ValueError")
+                continue
+                
+            expected = case.get("expected_inv")
+            if expected:
+                import numpy as np
+                assert np.allclose(inv_A, expected, atol=1e-7), "Ma trận nghịch đảo không khớp expected"
+            else:
+                # Nếu không có expected cụ thể, tự nhân ngược lại với A để kiểm tra bằng hàm verify_inverse
+                # Định lý: A * A^-1 sẽ ra ma trận đơn vị I
+                assert verify_inverse(case["input"], inv_A), "AA^-1 không bằng ma trận đơn vị I"
+                
+            AutoTestReporter.print_result(case['name'], True)
+            passed_count += 1
+            
+        except ValueError as err:
+            if case.get("should_raise") == ValueError:
+                AutoTestReporter.print_result(case['name'], True, f"(Bắt đúng lỗi: {err})")
+                passed_count += 1
+            else:
+                AutoTestReporter.print_result(case['name'], False, f"(Lỗi ngoài mong đợi: {err})")
+        except AssertionError as err:
+            AutoTestReporter.print_result(case['name'], False, f"(Assertion: {err})")
+            
+    AutoTestReporter.print_summary(passed_count, total_count)
 
-    # 1. Kiểm tra điều kiện AA^-1 = I
-    # Tính tích A * A^-1
-    identity_check = np.dot(A_np, inv_custom_np)
-    I_matrix = np.eye(n)
-    
-    # Kiểm tra xem tích có xấp xỉ ma trận đơn vị không
-    is_identity = np.allclose(identity_check, I_matrix, atol=config.EPSILON)
-
-    # 2. So sánh trực tiếp với kết quả của NumPy
-    try:
-        inv_numpy = np.linalg.inv(A_np)
-        matches_numpy = np.allclose(inv_custom_np, inv_numpy, atol=config.EPSILON)
-    except np.linalg.LinAlgError:
-        matches_numpy = False
-
-    return is_identity and matches_numpy
+if __name__ == "__main__":
+    from test_case import INVERSE_TEST_CASES
+    verify_test_inverse(INVERSE_TEST_CASES)
 
