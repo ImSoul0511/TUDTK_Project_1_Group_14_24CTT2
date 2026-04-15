@@ -49,7 +49,7 @@ def svd(A):
     # Bước 4: Tìm ma trận U (Vector riêng của AAT)
     # Sử dụng công thức liên hệ: u_i = (1 / sigma_i) * A * v_i
     U = []
-    for i in range(len(sigmas)):
+    for i in range(min(len(A), len(sigmas))):
         if not config.is_zero(sigmas[i]): # Chỉ tính nếu giá trị kỳ dị đủ lớn (tránh nhiễu)
             v_i = [V[row][i] for row in range(len(V))]
             u_i = [sum(A[r][c] * v_i[c] for c in range(len(v_i))) for r in range(len(A))]

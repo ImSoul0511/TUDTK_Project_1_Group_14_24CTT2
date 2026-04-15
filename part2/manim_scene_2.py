@@ -31,8 +31,8 @@ Render order:
 # ==============================================================================
 class Scene2(MovingCameraScene):
     def construct(self):
-        self.camera.frame.shift(DOWN * 1.5)
-        center_y = -1.5
+        self.camera.frame.shift(DOWN * 1.0)
+        center_y = -1.0
 
         # ------------------------------------------
         # STEP 1: INTRO – 3 ô vuông S – V – D
@@ -184,7 +184,7 @@ class Scene2(MovingCameraScene):
             "I", "=",
             r"\begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}",
             font_size=48
-        ).move_to(np.array([0, -3.8, 0])).set_z_index(12)
+        ).move_to(np.array([0, -2.0, 0])).set_z_index(12)
 
         self.play(FadeIn(frame_box, masks), Write(title_step4))
         self.play(FadeIn(geometry))
@@ -403,7 +403,7 @@ class Scene2_Sigma(MovingCameraScene):
             "D", "=",
             r"\begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}",
             font_size=48
-        ).move_to(np.array([0, -3.8, 0])).set_z_index(12)
+        ).move_to(np.array([0, -3.1, 0])).set_z_index(12)
         math_D[0].set_color(ORANGE)
 
         self.play(FadeIn(frame_box, masks), Write(title_diag))

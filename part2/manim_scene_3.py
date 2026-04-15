@@ -1,3 +1,4 @@
+from numpy import ndarray
 import numpy as np
 from manim import *
 from part2.utils import orthogonal_matrix, matrix_transpose, vector_normalize
@@ -16,7 +17,7 @@ Flow:
     8. Khi lấy chuyển vị của Q tác động lên không gian, ta thấy các vector riêng được quay về trùng với các trục chuẩn.
     (Lấy Q^T bằng hàm matrix_transpose rồi biểu diễn ảnh hưởng của Q^T lên không gian).
     9. Nhận xét: Với một ma trận bất kỳ, khi ta nhân bản thân nó với chuyển vị của nó, ta thu được một ma trận đối xứng. 
-
+    10. Suy ra: Việc nhân ma trận A ban đầu với A^T hoặc A^T với A, ta sẽ thu được một ma trận đối xứng có đầy đủ các tính chất mà ta đã đề cập.
 Render order:
     manim -pql part2/manim_scene_3.py Scene3
     manim -pql part2/manim_scene_3.py Scene3_Rotation
@@ -42,6 +43,38 @@ def _compute_eigen_data():
     return eigenvalues, eigenvectors, Q_rows, Q_T_rows
 
 
+def create_rainbow_cube(size=1.0, subdivisions=3, opacity=0.55):
+    """Cube đa sắc: 6 mặt, mỗi mặt chia subdivisions×subdivisions ô."""
+    palette = [BLUE_B, TEAL_B, GREEN_B, YELLOW_B, ORANGE, RED_B, PINK, PURPLE_B]
+    step = size / subdivisions
+    half = size / 2.0
+    cells = VGroup()
+    ci = 0
+    for fixed_ax, fixed_val, ax1, ax2 in [
+        (2, +half, 0, 1), (2, -half, 0, 1),
+        (1, +half, 0, 2), (1, -half, 0, 2),
+        (0, +half, 1, 2), (0, -half, 1, 2),
+    ]:
+        for i in range(subdivisions):
+            for j in range(subdivisions):
+                colour = palette[ci % len(palette)]
+                ci += 1
+                centre = np.zeros(3)
+                centre[fixed_ax] = fixed_val
+                centre[ax1] = -half + step * (i + 0.5)
+                centre[ax2] = -half + step * (j + 0.5)
+                d1 = np.zeros(3); d1[ax1] = step / 2
+                d2 = np.zeros(3); d2[ax2] = step / 2
+                poly = Polygon(
+                    centre - d1 - d2, centre + d1 - d2,
+                    centre + d1 + d2, centre - d1 + d2,
+                    fill_color=colour, fill_opacity=opacity,
+                    stroke_color=colour, stroke_width=0.5, stroke_opacity=0.4,
+                )
+                cells.add(poly)
+    return cells
+
+
 # ==============================================================================
 # SCENE 3: Steps 1–5 (Tính chất ma trận đối xứng + Eigenvectors 3D + Q)
 # ==============================================================================
@@ -62,8 +95,6 @@ class Scene3(ThreeDScene):
         mask_right = Rectangle(width=10, height=6,  color=BLACK, fill_opacity=1).next_to(frame_box, RIGHT, buff=0)
         masks = VGroup(mask_top, mask_bot, mask_left, mask_right).set_z_index(15)
 
-        self.add_fixed_in_frame_mobjects(frame_box, masks)
-
         # ──────────────────────────────────────────
         # STEP 1: Giới thiệu tính chất ma trận đối xứng
         # ──────────────────────────────────────────
@@ -71,7 +102,7 @@ class Scene3(ThreeDScene):
         title.next_to(frame_box, UP, buff=0.15).set_z_index(25)
         self.add_fixed_in_frame_mobjects(title)
 
-        self.play(FadeIn(frame_box, masks), Write(title))
+        self.play(Write(title))
 
         # Hiển thị ma trận đối xứng A (2D overlay)
         mat_A = MathTex(
@@ -114,6 +145,15 @@ class Scene3(ThreeDScene):
         # STEP 3: Tìm eigenvalues & eigenvectors bằng eigen_decomposition
         # ──────────────────────────────────────────
         # Hiện kết quả eigen bằng text overlay
+        self.add_fixed_in_frame_mobjects(frame_box, masks)
+        self.play(FadeIn(frame_box, masks))
+        
+
+        subtitle_eigen = Text("Kết quả phân tích trị riêng (Jacobi):", font_size=20, color=GOLD).set_z_index(25)
+        subtitle_eigen.next_to(frame_box, DOWN, buff=0.05)
+        self.add_fixed_in_frame_mobjects(subtitle_eigen)
+        self.remove(subtitle_eigen)
+
         eigen_lines = VGroup()
         ev_colors = [BLUE, GREEN, RED]
         for i in range(3):
@@ -121,17 +161,12 @@ class Scene3(ThreeDScene):
             vec_str = f"({ev_np[i][0]:.2f}, {ev_np[i][1]:.2f}, {ev_np[i][2]:.2f})"
             line = Text(f"λ{i+1} = {lam_val}    v{i+1} = {vec_str}", font_size=18, color=ev_colors[i])
             eigen_lines.add(line)
-        eigen_lines.arrange(DOWN, aligned_edge=LEFT, buff=0.25).set_z_index(25)
-        eigen_lines.next_to(frame_box, DOWN, buff=0.25)
+        eigen_lines.arrange(DOWN, aligned_edge=LEFT, buff=0.1).set_z_index(25)
+        eigen_lines.next_to(subtitle_eigen, DOWN, buff=0.25)
 
         for line in eigen_lines:
             self.add_fixed_in_frame_mobjects(line)
             self.remove(line)
-
-        subtitle_eigen = Text("Kết quả phân tích trị riêng (Jacobi):", font_size=20, color=GOLD).set_z_index(25)
-        subtitle_eigen.next_to(frame_box, DOWN, buff=0.05)
-        self.add_fixed_in_frame_mobjects(subtitle_eigen)
-        self.remove(subtitle_eigen)
 
         # Trục 3D
         axes = ThreeDAxes(
@@ -304,167 +339,130 @@ class Scene3(ThreeDScene):
 # ==============================================================================
 class Scene3_Rotation(ThreeDScene):
     def construct(self):
+        # 1. Chuẩn bị dữ liệu
         eigenvalues, eigenvectors, Q_rows, Q_T_rows = _compute_eigen_data()
-        ev_np = [np.array(v, dtype=float) for v in eigenvectors]
-        q_np = [np.array(vector_normalize(v), dtype=float) for v in eigenvectors]
-        Q_mat = np.array(Q_rows, dtype=float)
-        QT_mat = np.array(Q_T_rows, dtype=float)
-        ev_colors = [BLUE, GREEN, RED]
+        # Q_rows: các vector riêng đã chuẩn hóa (v1, v2, v3) theo hàng.
+        v_np = [np.array(v) for v in Q_rows]
+        
+        # Q mat (cột là basis vectors)
+        Q_mat = np.array(Q_rows).T
+        # QT mat (hàng là basis vectors)
+        QT_mat = np.array(Q_rows)
 
-        # --- Frame + Masks ---
-        self.move_camera(frame_center=np.array([0, -0.75, 0]))
-        frame_box = Rectangle(width=12, height=5, color=WHITE, stroke_width=2).move_to(ORIGIN)
-        frame_box.set_z_index(20)
-
-        mask_top   = Rectangle(width=32, height=10, color=BLACK, fill_opacity=1).next_to(frame_box, UP, buff=0)
-        mask_bot   = Rectangle(width=32, height=10, color=BLACK, fill_opacity=1).next_to(frame_box, DOWN, buff=0)
-        mask_left  = Rectangle(width=10, height=6,  color=BLACK, fill_opacity=1).next_to(frame_box, LEFT, buff=0)
-        mask_right = Rectangle(width=10, height=6,  color=BLACK, fill_opacity=1).next_to(frame_box, RIGHT, buff=0)
-        masks = VGroup(mask_top, mask_bot, mask_left, mask_right).set_z_index(15)
-
+        # 2. Thiết lập khung hình & Masks
+        self.move_camera(frame_center=np.array([0,0,-0.9]))
+        frame_box = Rectangle(width=12, height=5, color=WHITE, stroke_width=2).move_to(ORIGIN).set_z_index(20)
+        frame_box.shift([0, 0.9, 0])
+        masks = VGroup(
+            Rectangle(width=32, height=10, color=BLACK, fill_opacity=1).next_to(frame_box, UP, buff=0),
+            Rectangle(width=32, height=10, color=BLACK, fill_opacity=1).next_to(frame_box, DOWN, buff=0),
+            Rectangle(width=10, height=6, color=BLACK, fill_opacity=1).next_to(frame_box, LEFT, buff=0),
+            Rectangle(width=10, height=6, color=BLACK, fill_opacity=1).next_to(frame_box, RIGHT, buff=0),
+        ).set_z_index(15)
         self.add_fixed_in_frame_mobjects(frame_box, masks)
 
-        title = Text("Ảnh hưởng của Ma trận Trực giao Q lên Không gian", font_size=22, color=GOLD)
-        title.next_to(frame_box, UP, buff=0.15).set_z_index(25)
+        axes = ThreeDAxes(axis_config={"stroke_width": 2}).move_to(ORIGIN)
+        basis_colors = [RED, GREEN, BLUE]
+        
+        # ════════════════════════════════════════════════════════════════════
+        # PHASE 1: Ảnh hưởng của Q (e_i -> v_i)
+        # ════════════════════════════════════════════════════════════════════
+        title = Text("Ảnh hưởng của Ma trận Trực giao Q", font_size=24, color=GOLD).set_z_index(25)
+        title.next_to(frame_box, UP, buff=0.01) # Sát nóc nhất có thể
         self.add_fixed_in_frame_mobjects(title)
 
-        self.play(FadeIn(frame_box, masks), Write(title))
+        # Standard basis e1, e2, e3
+        e_vectors = VGroup(*[
+            Arrow3D(start=axes.get_origin(), end=axes.c2p(*v), color=basis_colors[i], resolution=8)
+            for i, v in enumerate([[1,0,0], [0,1,0], [0,0,1]])
+        ])
+        e_labels = VGroup(*[
+            MathTex(f"e_{i+1}", font_size=24, color=basis_colors[i]).next_to(e_vectors[i].get_end(), UP+RIGHT, buff=0.1)
+            for i in range(3)
+        ])
 
-        # --- Trục 3D ---
-        axes = ThreeDAxes(
-            x_range=[-3, 3], y_range=[-3, 3], z_range=[-3, 3],
-            axis_config={"stroke_width": 2}
+        self.set_camera_orientation(phi=65 * DEGREES, theta=45 * DEGREES)
+        self.play(FadeIn(frame_box, masks), Create(axes), Write(title))
+        self.play(Create(e_vectors), Write(e_labels), run_time=1.5)
+        self.wait(1)
+
+        q_expl = Text("Ma trận Q xoay các trục chuẩn (eᵢ) về trùng với các vector riêng (vᵢ)", font_size=18, color=BLUE).set_z_index(25)
+        q_expl.next_to(frame_box, DOWN, buff=0.25)
+        
+        # Matrix Q view (columns)
+        q_mat_viz = MathTex(r"Q = \begin{bmatrix} | & | & | \\ v_1 & v_2 & v_3 \\ | & | & | \end{bmatrix}", 
+                            font_size=32, color=BLUE).set_z_index(25)
+        q_mat_viz.next_to(q_expl, DOWN, buff=0.2)
+        
+        self.add_fixed_in_frame_mobjects(q_expl, q_mat_viz)
+        self.play(FadeIn(q_expl, q_mat_viz, shift=UP))
+        self.wait(1)
+
+        # Transform e_i -> v_i
+        v_labels = VGroup(*[
+            MathTex(f"v_{i+1}", font_size=24, color=basis_colors[i])
+            for i in range(3)
+        ])
+
+        self.play(
+            ApplyMatrix(Q_mat, e_vectors),
+            FadeOut(e_labels),
+            run_time=3
         )
-        axes.move_to(np.array([0, -0.3, 0]))
-        origin = axes.get_origin()
-
-        self.move_camera(phi=65 * DEGREES, theta=35 * DEGREES, run_time=2)
-        self.play(Create(axes))
-
-        # Hiển thị eigenvector arrows (mờ hơn, dùng làm tham chiếu)
-        eigen_arrows = VGroup()
+        
+        # Update v_labels position
         for i in range(3):
-            direction = q_np[i] * 2.0
-            arrow = Arrow3D(
-                start=origin, end=origin + direction,
-                color=ev_colors[i], resolution=8
-            )
-            arrow.set_opacity(0.4)
-            eigen_arrows.add(arrow)
-
-        eigen_label = Text("Mờ: vector riêng (đã chuẩn hóa)", font_size=16, color=GREY_B).set_z_index(25)
-        eigen_label.next_to(frame_box, DOWN, buff=0.15)
-        self.add_fixed_in_frame_mobjects(eigen_label)
-        self.remove(eigen_label)
-
-        self.play(Create(eigen_arrows), FadeIn(eigen_label))
-        self.wait(1)
-
-        # Tạo basis vectors chuẩn (đậm)
-        std_arrows = VGroup()
-        std_colors = [YELLOW, TEAL, MAROON_B]
-        std_labels_text = ["e₁(x)", "e₂(y)", "e₃(z)"]
-        std_dirs = [np.array([2, 0, 0], dtype=float),
-                    np.array([0, 2, 0], dtype=float),
-                    np.array([0, 0, 2], dtype=float)]
-
-        for i in range(3):
-            arrow = Arrow3D(
-                start=origin, end=origin + std_dirs[i],
-                color=std_colors[i], resolution=8
-            )
-            std_arrows.add(arrow)
-
-        self.play(Create(std_arrows))
-        self.wait(1)
-
-        # ──────────────────────────────────────────
-        # STEP 7: Áp dụng Q lên không gian
-        # ──────────────────────────────────────────
-        self.play(FadeOut(eigen_label))
-
-        step7_label = Text("Áp dụng Q: Trục chuẩn QUAY về trùng vector riêng", font_size=18, color=TEAL).set_z_index(25)
-        step7_label.next_to(frame_box, DOWN, buff=0.15)
-        self.add_fixed_in_frame_mobjects(step7_label)
-        self.remove(step7_label)
-        self.play(FadeIn(step7_label))
-
-        # Nhóm trục chuẩn + axes để áp dụng biến đổi
-        space_group = VGroup(axes, std_arrows)
-        space_group.save_state()
-
-        self.play(ApplyMatrix(Q_mat, space_group), run_time=3)
-        self.wait(1)
-
-        result7 = Text("→ Trục chuẩn (đậm) trùng vector riêng (mờ)!", font_size=18, color=GREEN).set_z_index(25)
-        result7.next_to(step7_label, DOWN, buff=0.15)
-        self.add_fixed_in_frame_mobjects(result7)
-        self.remove(result7)
-        self.play(FadeIn(result7))
-
-        # Quay camera để thấy rõ
-        self.move_camera(phi=50 * DEGREES, theta=75 * DEGREES, run_time=2)
+            v_labels[i].next_to(e_vectors[i].get_end(), UP+RIGHT, buff=0.1)
+        
+        self.play(Write(v_labels))
         self.wait(2)
 
-        # Khôi phục
-        self.play(FadeOut(step7_label, result7))
-        self.play(Restore(space_group), run_time=2)
-        self.wait(1)
+        # ════════════════════════════════════════════════════════════════════
+        # PHASE 2: Ảnh hưởng của Qᵀ (v_i -> e_i)
+        # ════════════════════════════════════════════════════════════════════
+        self.play(FadeOut(q_expl, q_mat_viz, title))
+        
+        title2 = Text("Ảnh hưởng của Ma trận Chuyển vị Qᵀ", font_size=24, color=GOLD).set_z_index(25)
+        title2.next_to(frame_box, UP, buff=0.02)
+        self.add_fixed_in_frame_mobjects(title2)
+        self.play(Write(title2))
 
-        # ──────────────────────────────────────────
-        # STEP 8: Áp dụng Q^T lên không gian — quay ngược
-        # ──────────────────────────────────────────
-        self.play(FadeOut(std_arrows))
+        qt_expl = Text("Vì Qᵀ = Q⁻¹, nó xoay các vector riêng về lại hệ trục chuẩn", font_size=18, color=TEAL).set_z_index(25)
+        qt_expl.next_to(frame_box, DOWN, buff=0.25)
+        
+        # Matrix QT view (rows)
+        qt_mat_viz = MathTex(r"Q^T = \begin{bmatrix} \rule{1cm}{0.4pt} & v_1^T & \rule{1cm}{0.4pt} \\ \rule{1cm}{0.4pt} & v_2^T & \rule{1cm}{0.4pt} \\ \rule{1cm}{0.4pt} & v_3^T & \rule{1cm}{0.4pt} \end{bmatrix}", 
+                             font_size=32, color=TEAL).set_z_index(25)
+        qt_mat_viz.next_to(qt_expl, DOWN, buff=0.2)
+        
+        self.add_fixed_in_frame_mobjects(qt_expl, qt_mat_viz)
+        self.play(FadeIn(qt_expl, qt_mat_viz, shift=UP))
+        self.wait(2)
 
-        # Bây giờ tạo eigenvector arrows ĐẬM (sẽ bị Q^T tác động)
-        eigen_arrows_bold = VGroup()
-        for i in range(3):
-            direction = q_np[i] * 2.0
-            arrow = Arrow3D(
-                start=origin, end=origin + direction,
-                color=ev_colors[i], resolution=8
-            )
-            eigen_arrows_bold.add(arrow)
-        self.play(Create(eigen_arrows_bold))
+        # Transform back v_i -> e_i
+        res_e_labels = VGroup(*[
+            MathTex(f"e_{i+1}", font_size=24, color=basis_colors[i])
+            for i in range(3)
+        ])
 
-        # Tạo trục chuẩn mờ làm tham chiếu
-        std_ref = VGroup()
-        for i in range(3):
-            arrow = Arrow3D(
-                start=origin, end=origin + std_dirs[i],
-                color=std_colors[i], resolution=8
-            )
-            arrow.set_opacity(0.4)
-            std_ref.add(arrow)
-        self.play(Create(std_ref))
-        self.play(FadeOut(eigen_arrows))  # bỏ eigenvector mờ cũ
-
-        step8_label = Text("Áp dụng Qᵀ: Vector riêng QUAY về trùng trục chuẩn", font_size=18, color=MAROON_B).set_z_index(25)
-        step8_label.next_to(frame_box, DOWN, buff=0.15)
-        self.add_fixed_in_frame_mobjects(step8_label)
-        self.remove(step8_label)
-        self.play(FadeIn(step8_label))
-
-        space_group_2 = VGroup(axes, eigen_arrows_bold)
-        self.play(ApplyMatrix(QT_mat, space_group_2), run_time=3)
-        self.wait(1)
-
-        result8 = Text("→ Vector riêng (đậm) trùng trục chuẩn (mờ)!", font_size=18, color=GREEN).set_z_index(25)
-        result8.next_to(step8_label, DOWN, buff=0.15)
-        self.add_fixed_in_frame_mobjects(result8)
-        self.remove(result8)
-        self.play(FadeIn(result8))
-
-        self.move_camera(phi=60 * DEGREES, theta=120 * DEGREES, run_time=2)
+        self.play(
+            ApplyMatrix(QT_mat, e_vectors),
+            FadeOut(v_labels),
+            run_time=3
+        )
+        
+        # Reset labels to standard axes
+        res_e_labels[0].next_to(e_vectors[0].get_end(), RIGHT, buff=0.1)
+        res_e_labels[1].next_to(e_vectors[1].get_end(), UP, buff=0.1)
+        res_e_labels[2].next_to(e_vectors[2].get_end(), OUT, buff=0.1)
+        
+        self.play(Write(res_e_labels))
         self.wait(3)
 
         # Dọn dẹp
-        self.play(FadeOut(
-            axes, eigen_arrows_bold, std_ref,
-            step8_label, result8, frame_box, masks, title
-        ))
-        self.wait(0.5)
-
+        self.play(FadeOut(axes, e_vectors, res_e_labels, frame_box, masks, title2, qt_expl, qt_mat_viz))
+        self.wait(1)
+        # # self.wait(1)
 
 # ==============================================================================
 # SCENE 3_Conclusion: Step 9 (A * A^T = ma trận đối xứng)
@@ -477,12 +475,12 @@ class Scene3_Conclusion(MovingCameraScene):
         # ──────────────────────────────────────────
         # STEP 9: A · A^T luôn là ma trận đối xứng
         # ──────────────────────────────────────────
-        title = Text("Nhận xét quan trọng", font_size=36, color=GOLD)
+        title = Text("Nhận xét:", font_size=36, color=GOLD)
         title.move_to(np.array([0, center_y + 3, 0]))
         self.play(Write(title))
 
         statement = Text(
-            "Với MA TRẬN BẤT KỲ A, tích  A · Aᵀ  luôn là ma trận đối xứng!",
+            "Với ma trận A bất kỳ, tích  A · Aᵀ  luôn là ma trận đối xứng",
             font_size=26, color=TEAL
         )
         statement.move_to(np.array([0, center_y + 1.8, 0]))
@@ -493,7 +491,10 @@ class Scene3_Conclusion(MovingCameraScene):
         proof_title = Text("Chứng minh:", font_size=24, color=WHITE)
         proof_title.move_to(np.array([-4, center_y + 0.6, 0]))
 
-        proof_1 = MathTex(r"\text{Đặt } B = A \cdot A^T", font_size=36)
+        proof_1 = VGroup(
+            Text("Đặt ", font_size=36),
+            MathTex(r"B = A \cdot A^T", font_size=36)
+        ).arrange(RIGHT)
         proof_2 = MathTex(r"B^T = (A \cdot A^T)^T = (A^T)^T \cdot A^T = A \cdot A^T = B", font_size=36, color=GREEN)
 
         proof_group = VGroup(proof_1, proof_2).arrange(DOWN, buff=0.5)
@@ -541,7 +542,7 @@ class Scene3_Conclusion(MovingCameraScene):
         self.wait(1)
 
         # Highlight tính đối xứng
-        sym_highlight = Text("→ Ma trận kết quả ĐỐI XỨNG qua đường chéo!", font_size=22, color=GOLD)
+        sym_highlight = Text("→ Ma trận kết quả đối xứng qua đường chéo", font_size=22, color=GOLD)
         sym_highlight.move_to(np.array([0, center_y - 2.2, 0]))
         self.play(Write(sym_highlight))
         self.wait(2)
@@ -550,18 +551,37 @@ class Scene3_Conclusion(MovingCameraScene):
         self.play(FadeOut(example_title, mat_example_A, arrow_mult, mat_example_B, sym_highlight))
 
         final_note = Text(
-            "Tính chất này là nền tảng quan trọng\nđể xây dựng phân rã SVD!",
+            "Tính chất này là nền tảng quan trọng\n         để xây dựng phân rã SVD!",
             font_size=30, color=GOLD, line_spacing=0.8
         )
         final_note.move_to(np.array([0, center_y + 0.5, 0]))
 
-        svd_hint = MathTex(
-            r"A^T A \rightarrow V, \quad A A^T \rightarrow U, \quad \sigma_i = \sqrt{\lambda_i}",
-            font_size=40, color=TEAL
-        )
-        svd_hint.next_to(final_note, DOWN, buff=0.8)
+        # Kết luận chi tiết về mối quan hệ SVD
+        v_line = VGroup(
+            MathTex(r"A^T A \rightarrow V", font_size=32, color=TEAL),
+            Text(": chứa các vector kì dị phải", font_size=24, color=TEAL)
+        ).arrange(RIGHT, buff=0.2)
+        
+        u_line = VGroup(
+            MathTex(r"A A^T \rightarrow U", font_size=32, color=TEAL),
+            Text(": chứa các vector kì dị trái", font_size=24, color=TEAL)
+        ).arrange(RIGHT, buff=0.2)
+        
+        svd_obs = Text("Nhận xét: U và V có cùng số lượng các giá trị kì dị", font_size=24, color=GOLD)
+        
+        sigma_line = VGroup(
+            Text("Giá trị kì dị: ", font_size=24, color=BLUE),
+            MathTex(r"\sigma_i = \sqrt{\lambda_i}", font_size=32, color=BLUE)
+        ).arrange(RIGHT, buff=0.2)
+
+        svd_summary = VGroup(v_line, u_line, svd_obs, sigma_line).arrange(DOWN, aligned_edge=LEFT, buff=0.4)
+        svd_summary.next_to(final_note, DOWN, buff=0.6)
 
         self.play(Write(final_note))
         self.wait(1)
-        self.play(FadeIn(svd_hint, shift=UP))
+        
+        for line in svd_summary:
+            self.play(FadeIn(line, shift=UP), run_time=0.8)
+            self.wait(0.5)
+            
         self.wait(4)
