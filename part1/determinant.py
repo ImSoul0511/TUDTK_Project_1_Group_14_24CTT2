@@ -1,4 +1,5 @@
 import config
+from config import AutoTestReporter
 
 def determinant(matrix_A):
     """
@@ -53,24 +54,45 @@ def determinant(matrix_A):
                 
     return ((-1) ** s) * det
 
-def verify_determinant(matrix_A, custom_det):
-    """
-    Kiểm chứng kết quả định thức bằng NumPy
 
-    Args:
-        matrix_A: Ma trận hệ số
-        custom_det: Giá trị định thức
-    
-    Returns:
-        True: Nếu trùng khớp
-        False: Nếu không trùng khớp
-    """
+def verify_test_determinant(test_cases: list[dict]):
+    import warnings
     import numpy as np
-    if not matrix_A:
-        return custom_det == 0.0
+    warnings.simplefilter("ignore", UserWarning) # Bỏ qua warning pivot nhỏ
     
-    A_np = np.array(matrix_A, dtype=float)
-    numpy_det = np.linalg.det(A_np)
+    AutoTestReporter.print_suite_header("Định Thức (Determinant)")
     
-    # Sử dụng isclose vì tính toán số thực luôn có sai số nhỏ
-    return np.isclose(custom_det, numpy_det)
+    passed_count = 0
+    total_count = len(test_cases)
+
+    for case in test_cases:
+        try:
+            # 1. Nếu test case kỳ vọng ném ra lỗi (VD: ma trận không vuông 2x3)
+            if "should_raise" in case:
+                try:
+                    d = determinant(case["A"])
+                    AutoTestReporter.print_result(case['name'], False, "Lẽ ra phải phát sinh lỗi")
+                except case["should_raise"] as err:
+                    AutoTestReporter.print_result(case['name'], True, f"-> Bắt đúng lỗi: {type(err).__name__}")
+                    passed_count += 1
+                continue
+
+            # 2. Tính toán định thức bình thường
+            d = determinant(case["A"])
+            expected = case["expected"]
+            
+            # Sử dụng np.isclose để trị sai số dấu phẩy động (đây là điều bắt buộc khi tính toán số thực trên máy tính)
+            if np.isclose(d, expected, atol=1e-7):
+                AutoTestReporter.print_result(case['name'], True, f"(det = {d:.4f})")
+                passed_count += 1
+            else:
+                AutoTestReporter.print_result(case['name'], False, f"-> Tính ra: {d}, Kỳ vọng: {expected}")
+                
+        except Exception as err:
+            AutoTestReporter.print_result(case['name'], False, f"-> Lỗi Runtime: {err}")
+            
+    AutoTestReporter.print_summary(passed_count, total_count)
+
+if __name__ == "__main__":
+    from test_case import DETERMINANT_TEST_CASES
+    verify_test_determinant(DETERMINANT_TEST_CASES)
