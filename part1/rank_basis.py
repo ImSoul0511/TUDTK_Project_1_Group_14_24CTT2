@@ -1,6 +1,7 @@
 import sys, os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import config
+from config import AutoTestReporter
 
 def rank_and_basis(matrix_A):
     """
@@ -81,56 +82,37 @@ def rank_and_basis(matrix_A):
 
     return rank_matrix, row_space_basis, col_space_basis, null_space_basis
 
-def verify_rank_and_basis(A, rank_custom, row_basis, col_basis, null_basis):
-    """
-    Kiểm chứng  hạng và cơ sở của không gian dòng, không gian cột, 
-    và không gian nghiệm bằng Numpy
-
-    Args:
-        A: Ma trận hệ số
-        rank_custom: Hạng ma trận
-        row_basis: cơ sở không gian dòng
-        col_basis: Cơ sở không gian cột
-        null_basis: Cơ sở không gian nghiệm
+def verify_test_rank_and_basis(test_cases: list[dict]):
+    import warnings
+    warnings.simplefilter("ignore", UserWarning)
     
-    Returns:
-        True: Nếu trùng khớp
-        False: Nếu không trùng khớp
-    """
-    import numpy as np
-    A_np = np.array(A, dtype=float)
-    rows, cols = A_np.shape
+    # Hàm test này kiểm tra hạng, số chiều của không gian nghiệm và cơ sở không gian nghiệm
+    AutoTestReporter.print_suite_header("Hạng và Cơ Sở (Rank & Basis)")
+    passed_count = 0
+    total_count = len(test_cases)
 
-    # --- 1. Kiểm tra Hạng (Rank) ---
-    rank_np = np.linalg.matrix_rank(A_np)
-    check_rank = (rank_custom == rank_np)
+    for case in test_cases:
+        try:
+            rank, r_basis, c_basis, n_basis = rank_and_basis(case["input"])
+            
+            assert rank == case["exp_rank"], f"Rank sai: got {rank}, want {case['exp_rank']}"
+            
+            if "exp_null_dim" in case:
+                assert len(n_basis) == case["exp_null_dim"], f"Null dim sai: got {len(n_basis)}, want {case['exp_null_dim']}"
+            if case.get("null_is_empty"):
+                assert len(n_basis) == 0, "Không gian nghiệm lẽ ra phải rỗng"
+                
+            AutoTestReporter.print_result(case['name'], True)
+            passed_count += 1
+            
+        except AssertionError as err:
+            AutoTestReporter.print_result(case['name'], False, f"(Assertion: {err})")
+        except Exception as err:
+            AutoTestReporter.print_result(case['name'], False, f"(Lỗi Runtime: {err})")
+            
+    AutoTestReporter.print_summary(passed_count, total_count)
 
-    # --- 2. Kiểm tra Không gian dòng (Row Space) ---
-    # Các vector trong row_basis phải độc lập tuyến tính và có số lượng = rank
-    check_row = False
-    if len(row_basis) == rank_custom:
-        # Cơ sở dòng tìm được phải có cùng không gian dòng với ma trận A gốc
-        if np.linalg.matrix_rank(np.vstack((A_np, np.array(row_basis)))) == rank_custom:
-            check_row = True
-
-    # --- 3. Kiểm tra Không gian cột (Column Space) ---
-    check_col = False
-    if len(col_basis) == rank_custom:
-        # Cơ sở cột tìm được phải có cùng không gian cột với ma trận A gốc
-        if np.linalg.matrix_rank(np.hstack((A_np, np.array(col_basis).T))) == rank_custom:
-            check_col = True
-
-    # --- 4. Kiểm tra Không gian nghiệm (Null Space) ---
-    # A * v phải = 0 và số lượng vector = cols - rank
-    check_null = True
-    if len(null_basis) != (cols - rank_custom):
-        check_null = False
-    else:
-        for v in null_basis:
-            if not np.allclose(np.dot(A_np, np.array(v)), 0, atol=1e-10):
-                check_null = False
-                break
-
-    return check_rank, check_row, check_col, check_null
-
+if __name__ == "__main__":
+    from test_case import RANK_BASIS_TEST_CASES
+    verify_test_rank_and_basis(RANK_BASIS_TEST_CASES)
 
