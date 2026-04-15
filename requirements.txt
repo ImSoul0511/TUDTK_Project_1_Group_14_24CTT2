@@ -10,6 +10,10 @@ pycairo>=1.29.0
 # Vẽ đồ thị
 matplotlib>=3.10.8
 
+# Trình bày notebook
+jinja2>=3.1.6
+ipython>=8.22.0
+
 # Chạy các file ipynb
 ipykernel>=7.2.0
 
