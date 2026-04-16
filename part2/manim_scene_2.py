@@ -184,7 +184,7 @@ class Scene2(MovingCameraScene):
             "I", "=",
             r"\begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}",
             font_size=48
-        ).move_to(np.array([0, -2.0, 0])).set_z_index(12)
+        ).next_to(frame_box, DOWN, buff=0.5).set_z_index(12)
 
         self.play(FadeIn(frame_box, masks), Write(title_step4))
         self.play(FadeIn(geometry))
