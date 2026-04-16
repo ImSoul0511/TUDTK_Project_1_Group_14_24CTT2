@@ -36,7 +36,7 @@ def determinant(matrix_A):
         
         # 2. Báo lỗi nếu cột toàn số 0 (ma trận suy biến)
         if config.is_zero(max_val):
-            print(f"không có pivot tại cột {i}")
+            # Không có pivot tại cột i
             return 0.0
             
         # 3. Hoán đổi dòng và đổi dấu định thức nếu có đổi chỗ
@@ -58,10 +58,7 @@ def determinant(matrix_A):
 def verify_test_determinant(test_cases: list[dict]):
     import warnings
     import numpy as np
-    warnings.simplefilter("ignore", UserWarning) # Bỏ qua warning pivot nhỏ
-    
-    AutoTestReporter.print_suite_header("Định Thức (Determinant)")
-    
+    warnings.simplefilter("ignore", UserWarning) # Bỏ qua warning pivot nhỏ    
     passed_count = 0
     total_count = len(test_cases)
 
@@ -70,26 +67,25 @@ def verify_test_determinant(test_cases: list[dict]):
             # 1. Nếu test case kỳ vọng ném ra lỗi (VD: ma trận không vuông 2x3)
             if "should_raise" in case:
                 try:
-                    d = determinant(case["A"])
-                    AutoTestReporter.print_result(case['name'], False, "Lẽ ra phải phát sinh lỗi")
+                    d = determinant(case["Ma trận A"])
+                    AutoTestReporter.print_result(case['Nội dung'], False, "Lẽ ra phải phát sinh lỗi")
                 except case["should_raise"] as err:
-                    AutoTestReporter.print_result(case['name'], True, f"-> Bắt đúng lỗi: {type(err).__name__}")
+                    AutoTestReporter.print_result(case['Nội dung'], True, f"\n-> Bắt đúng lỗi: {type(err).__name__}:{err}")
                     passed_count += 1
                 continue
 
             # 2. Tính toán định thức bình thường
-            d = determinant(case["A"])
-            expected = case["expected"]
+            d = determinant(case["Ma trận A"])
+            expected = case["expected_answer"]
             
             # Sử dụng np.isclose để trị sai số dấu phẩy động (đây là điều bắt buộc khi tính toán số thực trên máy tính)
             if np.isclose(d, expected, atol=1e-7):
-                AutoTestReporter.print_result(case['name'], True, f"(det = {d:.4f})")
+                AutoTestReporter.print_result(case['Nội dung'], True, f"(det = {d:.4f})")
                 passed_count += 1
             else:
-                AutoTestReporter.print_result(case['name'], False, f"-> Tính ra: {d}, Kỳ vọng: {expected}")
-                
+                AutoTestReporter.print_result(case['Nội dung'], False, f"-> Tính ra: {d}, Kỳ vọng: {expected}")
         except Exception as err:
-            AutoTestReporter.print_result(case['name'], False, f"-> Lỗi Runtime: {err}")
+            AutoTestReporter.print_result(case['Nội dung'], False, f"-> Lỗi Runtime: {err}")
             
     AutoTestReporter.print_summary(passed_count, total_count)
 

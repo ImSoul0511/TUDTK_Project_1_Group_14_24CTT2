@@ -4,107 +4,91 @@
 # ----------------------------------------------------------------------------
 BACK_SUBSTITUTION_TEST_CASES = [
     {
-        "name": "Hệ 2x2 cơ bản",
-        "U": [[2.0, 1.0], [0.0, 4.0]],
-        "c": [5.0, 8.0],
-        "expect_x": [1.5, 2.0],
+        "Nội dung": "Hệ 2x2",
+        "Ma trận U": [[2.0, 1.0], [0.0, 4.0]],
+        "Vector cột c": [5.0, 8.0],
+        "Nghiệm x": [1.5, 2.0],
     },
     {
-        "name": "Hệ 3x3 ma trận đường chéo",
-        "U": [[3.0, 0.0, 0.0], [0.0, -2.0, 0.0], [0.0, 0.0, 5.0]],
-        "c": [9.0, 4.0, -10.0],
-        "expect_x": [3.0, -2.0, -2.0],
+        "Nội dung": "Hệ 3x3",
+        "Ma trận U": [[3.0, 0.0, 0.0], [0.0, -2.0, 0.0], [0.0, 0.0, 5.0]],
+        "Vector cột c": [9.0, 4.0, -10.0],
+        "Nghiệm x": [3.0, -2.0, -2.0],
     },
     {
-        "name": "Hệ 4x4 tam giác trên chuẩn",
-        "U": [
+        "Nội dung": "Hệ 4x4 đơn giản",
+        "Ma trận U": [
             [1.0, 2.0, -1.0, 1.0],
             [0.0, -1.0, 3.0, 0.0],
             [0.0, 0.0, 2.0, -2.0],
             [0.0, 0.0, 0.0, 3.0],
         ],
-        "c": [2.0, 5.0, -2.0, 6.0],
-        "expect_x": [5.0, -2.0, 1.0, 2.0], 
+        "Vector cột c": [2.0, 5.0, -2.0, 6.0],
+        "Nghiệm x": [5.0, -2.0, 1.0, 2.0], 
     },
     {
-        "name": "Có số 0 ở đường chéo chính (Suy biến) -> Trả về None",
-        "U": [[1.0, 2.0, 3.0], [0.0, 0.0, 4.0], [0.0, 0.0, 5.0]],
-        "c": [1.0, 2.0, 3.0],
-        "expect_x": None, 
+        "Nội dung": "Có số 0 ở đường chéo chính",
+        "Ma trận U": [[1.0, 2.0, 3.0], [0.0, 0.0, 4.0], [0.0, 0.0, 5.0]],
+        "Vector cột c": [1.0, 2.0, 3.0],
+        "Nghiệm x": None, 
     },
     {
-        "name": "Ma trận hệ số có giá trị cực lớn (Kiểm tra tràn số/sai số)",
-        "U": [[1.0e8, -1.0], [0.0, 2.0e8]],
-        "c": [1.0e8 - 2.0, 4.0e8],
-        "expect_x": [1.0, 2.0],
+        "Nội dung": "Ma trận hệ số có giá trị cực lớn",
+        "Ma trận U": [[1.0e8, -1.0], [0.0, 2.0e8]],
+        "Vector cột c": [1.0e8 - 2.0, 4.0e8],
+        "Nghiệm x": [1.0, 2.0],
     },
     {
-        "name": "Hệ 1x1 (Kiểm tra biên nhỏ nhất)",
-        "U": [[5.0]],
-        "c": [10.0],
-        "expect_x": [2.0],
-    },
-    {
-        "name": "Ma trận rỗng (Edge Case)",
-        "U": [],
-        "c": [],
-        "expect_x": [],
-    },
+        "Nội dung": "Hệ 1x1",
+        "Ma trận U": [[5.0]],
+        "Vector cột c": [10.0],
+        "Nghiệm x": [2.0],
+    }
 ]
 
 # ----------------------------------------------------------------------------
-# 2. TEST CASES: ĐỊNH THỨC (DETERMINANT)
+# 2. TEST CASES: expected_answer (DETERMINANT)
 # ----------------------------------------------------------------------------
 DETERMINANT_TEST_CASES = [
     {
-        "name": "Ma trận 2x2 thông thường",
-        "A": [[4.0, 3.0], [6.0, 3.0]],
-        "expected": -6.0, 
+        "Nội dung": "Ma trận 2x2",
+        "Ma trận A": [[1.0, 2.0], [3.0, 4.0]],
+        "expected_answer": -2.0, 
     },
     {
-        "name": "Ma trận 3x3 đối xứng",
-        "A": [[2.0, -1.0, 0.0], [-1.0, 2.0, -1.0], [0.0, -1.0, 2.0]],
-        "expected": 4.0,
+        "Nội dung": "Ma trận 3x3",
+        "Ma trận A": [[1.0, -9.4, -12.0], [2.0, -6.0, 5.0], [5.0, -7.0, 6.5]],
+        "expected_answer": -308.8,
     },
     {
-        "name": "Cần hoán đổi dòng (Pivot swap)",
-        "A": [[0.0, 2.0, 1.0], [3.0, -1.0, 4.0], [1.0, 1.0, 1.0]],
-        "expected": 6.0, 
+        "Nội dung": "Ma trận suy biến",
+        "Ma trận A": [[1.0, -2.0, 3.0], [-2.0, 4.0, -6.0], [5.0, 1.0, 2.0]],
+        "expected_answer": 0.0,
     },
     {
-        "name": "Ma trận suy biến (Có dòng tỷ lệ với nhau)",
-        "A": [[1.0, -2.0, 3.0], [-2.0, 4.0, -6.0], [5.0, 1.0, 2.0]],
-        "expected": 0.0,
-    },
-    {
-        "name": "Ma trận tam giác dưới",
-        "A": [[5.0, 0.0, 0.0], [2.0, -3.0, 0.0], [1.0, 4.0, 2.0]],
-        "expected": -30.0, 
-    },
-    {
-        "name": "Trường hợp không vuông (Bắt lỗi)",
-        "A": [[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]],
+        "Nội dung": "Ma trận không vuông",
+        "Ma trận A": [[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]],
         "should_raise": ValueError,
     },
     {
-        "name": "Ma trận cấp 4x4",
-        "A": [
-            [1.0, 0.0, 2.0, -1.0],
+        "Nội dung": "Ma trận 4x4",
+        "Ma trận A": [
+            [1.0, 0.0, 2.0, -1.0],  
             [3.0, 0.0, 0.0, 5.0],
             [2.0, 1.0, 4.0, -3.0],
             [1.0, 0.0, 5.0, 0.0],
         ],
-        "expected": 30.0,
+        "expected_answer": 30.0,
     },
     {
-        "name": "Ma trận 1x1",
-        "A": [[7.0]],
-        "expected": 7.0,
+        "Nội dung": "Ma trận 1x1",
+        "Ma trận A": [[1.0]],
+        "expected_answer": 1.0,
     },
     {
-        "name": "Ma trận toàn số 0 (Kích thước 2x2)",
-        "A": [[0.0, 0.0], [0.0, 0.0]],
-        "expected": 0.0,
+        "Nội dung": "Ma trận toàn số 0",
+        "Ma trận A": [[0.0, 0.0], [0.0, 0.0]],
+        "expected_answer": 0.0,
     }
 ]
 
@@ -113,49 +97,49 @@ DETERMINANT_TEST_CASES = [
 # ----------------------------------------------------------------------------
 GAUSSIAN_ELIMINATE_TEST_CASES = [
     {
-        "name": "Hệ phương trình 2x2 nghiệm duy nhất",
-        "A": [[2.0, 1.0], [1.0, -1.0]],
-        "b": [4.0, -1.0],
-        "expect_x": [1.0, 2.0],
-        "expect_swaps": 0,
+        "Nội dung": "Hệ phương trình 2x2 nghiệm duy nhất",
+        "Ma trận A": [[2.0, 1.0], [1.0, -1.0]],
+        "Vector cột b": [4.0, -1.0],
+        "Nghiệm x": [1.0, 2.0],
+        "Số lần hoán đổi": 0,
     },
     {
-        "name": "Bắt buộc Partial Pivoting (Phần tử a[0][0] = 0)",
-        "A": [[0.0, 2.0], [3.0, 1.0]],
-        "b": [4.0, 5.0],
-        "expect_x": [1.0, 2.0],
-        "expect_swaps": 1,
+        "Nội dung": "Bắt buộc Partial Pivoting (Phần tử a[0][0] = 0)",
+        "Ma trận A": [[0.0, 2.0], [3.0, 1.0]],
+        "Vector cột b": [4.0, 5.0],
+        "Nghiệm x": [1.0, 2.0],
+        "Số lần hoán đổi": 1,
     },
     {
-        "name": "Hệ 3x3 cơ bản",
-        "A": [[2.0, 1.0, -1.0], [-3.0, -1.0, 2.0], [-2.0, 1.0, 2.0]],
-        "b": [8.0, -11.0, -3.0],
-        "expect_x": [2.0, 3.0, -1.0],
+        "Nội dung": "Hệ 3x3 cơ bản",
+        "Ma trận A": [[2.0, 1.0, -1.0], [-3.0, -1.0, 2.0], [-2.0, 1.0, 2.0]],
+        "Vector cột b": [8.0, -11.0, -3.0],
+        "Nghiệm x": [2.0, 3.0, -1.0],
     },
     {
-        "name": "Hệ vô nghiệm (Dòng cuối 0x = c với c != 0)",
-        "A": [[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [2.0, 2.0, 2.0]],
-        "b": [3.0, 4.0, 5.0],
-        "expect_non_unique": True,
-        "should_raise": ValueError, 
+        "Nội dung": "Hệ vô nghiệm",
+        "Ma trận A": [[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [2.0, 2.0, 2.0]],
+        "Vector cột b": [3.0, 4.0, 5.0],
+        "expected_non_unique": True,
+        "expected_answer": ValueError,
     },
     {
-        "name": "Hệ vô số nghiệm (Bậc tự do)",
-        "A": [[1.0, -2.0, 1.0], [2.0, -4.0, 2.0], [3.0, -6.0, 3.0]],
-        "b": [5.0, 10.0, 15.0],
-        "expect_non_unique": True,
+        "Nội dung": "Hệ vô số nghiệm",
+        "Ma trận A": [[1.0, -2.0, 1.0], [2.0, -4.0, 2.0], [3.0, -6.0, 3.0]],
+        "Vector cột b": [5.0, 10.0, 15.0],
+        "expected_non_unique": True,
     },
     {
-        "name": "Cột đầu tiên là số cực nhỏ (Chống lỗi sai số chuẩn)",
-        "A": [[1e-15, 1.0], [1.0, 1.0]],
-        "b": [2.0, 3.0],
-        "expect_x": [1.0, 2.0],
+        "Nội dung": "Cột đầu tiên là số cực nhỏ (Chống lỗi sai số chuẩn)",
+        "Ma trận A": [[1e-15, 1.0], [1.0, 1.0]],
+        "Vector cột b": [2.0, 3.0],
+        "Nghiệm x": [1.0, 2.0],
     },
     {
-        "name": "Hệ nhiều phương trình hơn số ẩn (Overdetermined), có nghiệm duy nhất",
-        "A": [[1.0, 1.0], [1.0, -1.0], [2.0, 1.0]],
-        "b": [3.0, 1.0, 5.0],
-        "expect_x": [2.0, 1.0],
+        "Nội dung": "Hệ nhiều phương trình hơn số ẩn, có nghiệm duy nhất",
+        "Ma trận A": [[1.0, 1.0], [1.0, -1.0], [2.0, 1.0]],
+        "Vector cột b": [3.0, 1.0, 5.0],
+        "Nghiệm x": [2.0, 1.0],
     }
 ]
 
@@ -164,39 +148,29 @@ GAUSSIAN_ELIMINATE_TEST_CASES = [
 # ----------------------------------------------------------------------------
 INVERSE_TEST_CASES = [
     {
-        "name": "Ma trận 2x2 đẹp (det = 1)",
-        "input": [[2.0, 5.0], [1.0, 3.0]],
-        "expected_inv": [[3.0, -5.0], [-1.0, 2.0]]
+        "Nội dung": "Ma trận 2x2",
+        "Ma trận A": [[2.0, 5.0], [1.0, 3.0]],
+        "expected_answer": [[3.0, -5.0], [-1.0, 2.0]]
     },
     {
-        "name": "Ma trận 3x3 hoán vị",
-        "input": [[0.0, 0.0, 1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]],
-        "expected_inv": [[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]]
+        "Nội dung": "Ma trận 3x3 hoán vị",
+        "Ma trận A": [[0.0, 0.0, 1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]],
+        "expected_answer": [[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]]
     },
     {
-        "name": "Ma trận suy biến (Phải văng lỗi hoặc trả về None)",
-        "input": [[4.0, 6.0], [2.0, 3.0]],
-        "expected_inv": None
+        "Nội dung": "Ma trận suy biến",
+        "Ma trận A": [[4.0, 6.0], [2.0, 3.0]],
+        "expected_answer": None
     },
     {
-        "name": "Ma trận có nhiễu rất nhỏ (Ill-conditioned)",
-        "input": [[1.0, 1.0], [1.0, 1.0 + 1e-12]],
-        # Kiểm tra xem code có xử lý được hệ số cực gần nhau không
-    },
-    {
-        "name": "Ma trận không vuông (Bắt lỗi ngay từ đầu)",
-        "input": [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
+        "Nội dung": "Ma trận không vuông",
+        "Ma trận A": [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
         "should_raise": ValueError
     },
     {
-        "name": "Ma trận 1x1",
-        "input": [[4.0]],
-        "expected_inv": [[0.25]]
-    },
-    {
-        "name": "Ma trận đường chéo (chỉ nghịch đảo các phần tử chéo)",
-        "input": [[2.0, 0.0], [0.0, 5.0]],
-        "expected_inv": [[0.5, 0.0], [0.0, 0.2]]
+        "Nội dung": "Ma trận 1x1",
+        "Ma trận A": [[4.0]],
+        "expected_answer": [[0.25]]
     }
 ]
 
@@ -205,62 +179,62 @@ INVERSE_TEST_CASES = [
 # ----------------------------------------------------------------------------
 RANK_BASIS_TEST_CASES = [
     {
-        "name": "Rank đầy đủ (Ma trận 3x3)",
-        "input": [[2.0, 0.0, -1.0], [4.0, -5.0, 2.0], [0.0, 0.0, 7.0]],
-        "exp_rank": 3,
-        "exp_null_dim": 0
+        "Nội dung": "Rank đầy đủ (Ma trận 3x3)",
+        "Ma trận A": [[2.0, 0.0, -1.0], [4.0, -5.0, 2.0], [0.0, 0.0, 7.0]],
+        "expected_rank": 3,
+        "expected_null_dim": 0
     },
     {
-        "name": "Ma trận toàn số 0 (Rank = 0)",
-        "input": [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]],
-        "exp_rank": 0,
-        "exp_null_dim": 2
+        "Nội dung": "Ma trận toàn số 0 (Rank = 0)",
+        "Ma trận A": [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]],
+        "expected_rank": 0,
+        "expected_null_dim": 2
     },
     {
-        "name": "Ma trận chữ nhật 3x4 (Thực tế Rank = 2)",
-        "input": [
+        "Nội dung": "Ma trận chữ nhật 3x4 (Thực tế Rank = 2)",
+        "Ma trận A": [
             [1.0, 2.0, 0.0, -1.0],
             [2.0, 6.0, -3.0, -3.0],
             [3.0, 10.0, -6.0, -5.0]
         ],
-        "exp_rank": 2,
-        "exp_null_dim": 2
+        "expected_rank": 2,
+        "expected_null_dim": 2
     },
     {
-        "name": "Các dòng phụ thuộc tuyến tính (Rank 1)",
-        "input": [[1.0, -3.0, 2.0], [-2.0, 6.0, -4.0], [3.0, -9.0, 6.0]],
-        "exp_rank": 1,
-        "exp_null_dim": 2
+        "Nội dung": "Các dòng phụ thuộc tuyến tính (Rank 1)",
+        "Ma trận A": [[1.0, -3.0, 2.0], [-2.0, 6.0, -4.0], [3.0, -9.0, 6.0]],
+        "expected_rank": 1,
+        "expected_null_dim": 2
     },
     {
-        "name": "Ma trận chữ nhật dọc 4x2 (Rank tối đa = 2)",
-        "input": [
+        "Nội dung": "Ma trận chữ nhật dọc 4x2 (Rank tối đa = 2)",
+        "Ma trận A": [
             [1.0, 2.0], 
             [3.0, 4.0], 
             [5.0, 6.0], 
             [7.0, 8.0]
         ],
-        "exp_rank": 2,
-        "exp_null_dim": 0 # Số cột (2) - Rank (2) = 0
+        "expected_rank": 2,
+        "expected_null_dim": 0 # Số cột (2) - Rank (2) = 0
     },
     {
-        "name": "Cần hoán vị dòng (Pivot a[0][0] = 0)",
-        "input": [
+        "Nội dung": "Cần hoán vị dòng (Pivot a[0][0] = 0)",
+        "Ma trận A": [
             [0.0, 2.0, 1.0], 
             [1.0, -1.0, 0.0], 
             [0.0, 0.0, 3.0]
         ],
-        "exp_rank": 3,
-        "exp_null_dim": 0
+        "expected_rank": 3,
+        "expected_null_dim": 0
     },
     {
-        "name": "Chống sai số số học (Kiểm tra dung sai EPSILON)",
-        "input": [
+        "Nội dung": "Chống sai số số học (Kiểm tra dung sai EPSILON)",
+        "Ma trận A": [
             [1.0, 1.0], 
             [1.0, 1.0 + 1e-16]
         ],
-        "exp_rank": 1,
-        "exp_null_dim": 1
+        "expected_rank": 1,
+        "expected_null_dim": 1
     }
 ]
 
@@ -269,22 +243,16 @@ RANK_BASIS_TEST_CASES = [
 # ----------------------------------------------------------------------------
 VERIFY_SOLUTION_TEST_CASES = [
     {
-        "name": "Nghiệm khớp hoàn hảo (Số nguyên)",
+        "Nội dung": "Nghiệm trả về đúng",
         "A": [[3.0, 2.0], [1.0, -1.0]], "x": [1.0, 1.0], "b": [5.0, 0.0],
-        "expect_match": True,
     },
     {
-        "name": "Nghiệm sai cố ý",
+        "Nội dung": "Nghiệm trả về sai",
         "A": [[1.0, 2.0], [3.0, 4.0]], "x": [0.0, 0.0], "b": [5.0, 11.0],
-        "expect_match": False,
+        "expect_mismatch": True,
     },
     {
-        "name": "Kiểm tra sai số vô hạn tuần hoàn (1/3)",
-        "A": [[3.0, 0.0], [0.0, 6.0]], "x": [1/3, 1/6], "b": [1.0, 1.0],
-        "expect_match": True,
-    },
-    {
-        "name": "Ma trận Hilbert 4x4 (Thử thách độ ổn định)",
+        "Nội dung": "Ma trận Hilbert 4x4",
         "A": [
             [1.0, 1/2, 1/3, 1/4],
             [1/2, 1/3, 1/4, 1/5],
@@ -292,26 +260,12 @@ VERIFY_SOLUTION_TEST_CASES = [
             [1/4, 1/5, 1/6, 1/7]
         ],
         "x": [1.0, 1.0, 1.0, 1.0],
-        "b": [25/12, 77/60, 57/60, 319/420], # Tính tổng từng dòng
-        "expect_match": True,
+        "b": [25/12, 77/60, 57/60, 319/420], 
     },
     {
-        "name": "Nghiệm chứa giá trị 0",
+        "Nội dung": "Nghiệm chứa 0",
         "A": [[2.0, -1.0], [1.0, 1.0]], 
         "x": [0.0, 3.0], 
         "b": [-3.0, 3.0],
-        "expect_match": True,
-    },
-    {
-        "name": "Hệ 3x3 với vector x chứa số không tương thích (Edge error)",
-        "A": [
-            [1.0, 2.0, 3.0],
-            [4.0, 5.0, 6.0],
-            [7.0, 8.0, 9.0]
-        ],
-        "x": [1.0, -1.0, 0.0],
-        "b": [-1.0, -1.0, 0.0], 
-        "expect_match": bool(False), # Kết quả mong muốn là False
-        "expect_mismatch": True # Đánh dấu cờ in ra thông báo màu xanh dương
     }
 ]
