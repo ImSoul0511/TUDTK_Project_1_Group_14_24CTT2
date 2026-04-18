@@ -41,7 +41,6 @@ Singular-Value-Decomposition/
 │   ├── rank_basis.py                # Tính hạng & các không gian con
 │   ├── verification.py              # Hệ thống kiểm chứng (NumPy)
 │   ├── test_case.py                 # Dữ liệu kiểm thử mẫu
-│   ├── run_all_test.py              # Script chạy toàn bộ test Part 1
 │   └── part1_demo.ipynb             # Notebook trình diễn Part 1
 ├── part2/                          # Chéo hóa & SVD
 │   ├── decomposition.py             # Cài đặt SVD Scratch
