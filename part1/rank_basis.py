@@ -38,7 +38,7 @@ def rank_and_basis(matrix_A):
                 max_row = i
 
         if config.is_zero(M[max_row][j]):
-            print(f"Không có pivot tại cột {j}")
+            # Không có pivot tại cột j
             continue
 
         if max_row != pivot_row:
@@ -85,28 +85,27 @@ def verify_test_rank_and_basis(test_cases: list[dict]):
     warnings.simplefilter("ignore", UserWarning)
     
     # Hàm test này kiểm tra hạng, số chiều của không gian nghiệm và cơ sở không gian nghiệm
-    AutoTestReporter.print_suite_header("Hạng và Cơ Sở (Rank & Basis)")
     passed_count = 0
     total_count = len(test_cases)
 
     for case in test_cases:
         try:
-            rank, r_basis, c_basis, n_basis = rank_and_basis(case["input"])
+            rank, r_basis, c_basis, n_basis = rank_and_basis(case["Ma trận A"])
             
-            assert rank == case["exp_rank"], f"Rank sai: got {rank}, want {case['exp_rank']}"
+            assert rank == case["expected_rank"], f"Rank sai: got {rank}, want {case['expected_rank']}"
             
-            if "exp_null_dim" in case:
-                assert len(n_basis) == case["exp_null_dim"], f"Null dim sai: got {len(n_basis)}, want {case['exp_null_dim']}"
+            if "expected_null_dim" in case:
+                assert len(n_basis) == case["expected_null_dim"], f"Null dim sai: got {len(n_basis)}, want {case['expected_null_dim']}"
             if case.get("null_is_empty"):
                 assert len(n_basis) == 0, "Không gian nghiệm lẽ ra phải rỗng"
                 
-            AutoTestReporter.print_result(case['name'], True)
+            AutoTestReporter.print_result(case['Nội dung'], True)
             passed_count += 1
             
         except AssertionError as err:
-            AutoTestReporter.print_result(case['name'], False, f"(Assertion: {err})")
+            AutoTestReporter.print_result(case['Nội dung'], False, f"(Assertion: {err})")
         except Exception as err:
-            AutoTestReporter.print_result(case['name'], False, f"(Lỗi Runtime: {err})")
+            AutoTestReporter.print_result(case['Nội dung'], False, f"(Lỗi Runtime: {err})")
             
     AutoTestReporter.print_summary(passed_count, total_count)
 

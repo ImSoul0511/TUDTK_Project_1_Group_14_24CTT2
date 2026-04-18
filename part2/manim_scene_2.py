@@ -184,7 +184,7 @@ class Scene2(MovingCameraScene):
             "I", "=",
             r"\begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}",
             font_size=48
-        ).move_to(np.array([0, -2.0, 0])).set_z_index(12)
+        ).next_to(frame_box, DOWN, buff=0.5).set_z_index(12)
 
         self.play(FadeIn(frame_box, masks), Write(title_step4))
         self.play(FadeIn(geometry))
@@ -459,11 +459,11 @@ class Scene2_Sigma(MovingCameraScene):
 
         # Highlight từng thành phần (label căn giữa dưới ma trận tương ứng)
         box_diag = SurroundingRectangle(mat_diag, color=ORANGE, buff=0.05)
-        label_diag = Text("Kéo giãn", font_size=15, color=ORANGE)
+        label_diag = Text("Kéo giãn", font_size=18, color=ORANGE)
         label_diag.next_to(mat_diag, DOWN, buff=0.4)
 
         box_dim = SurroundingRectangle(mat_dim, color=TEAL, buff=0.05)
-        label_dim = Text("Hiệu chỉnh chiều", font_size=15, color=TEAL)
+        label_dim = Text("Hiệu chỉnh chiều", font_size=18, color=TEAL)
         label_dim.next_to(mat_dim, DOWN, buff=0.4)
 
         self.play(Create(box_diag), FadeIn(label_diag))

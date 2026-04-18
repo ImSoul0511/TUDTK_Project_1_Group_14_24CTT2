@@ -370,13 +370,15 @@ class Scene4_SVD(ThreeDScene):
         
         # Position it, but don't add to fixed_in_frame yet to avoid duplicate rendering/glitch
         sig_decomp.next_to(frame_box, DOWN, buff=0.18)
+        self.add_fixed_in_frame_mobjects(sig_decomp)
+        sig_decomp.set_opacity(0)
 
         self.play(
             FadeOut(t3_intro), 
             ReplacementTransform(sig_full, sig_decomp), 
-            run_time=0.8
+            sig_decomp.animate.set_opacity(1),
+            run_time=1.2
         )
-        self.add_fixed_in_frame_mobjects(sig_decomp) # Ensure it's now fixed
         self.wait(0.5)
 
         t3a = title_text(

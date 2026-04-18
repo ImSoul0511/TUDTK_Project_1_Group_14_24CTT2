@@ -58,39 +58,36 @@ def inverse(matrix_A):
 def verify_test_inverse(test_cases: list[dict]):
     import warnings
     warnings.simplefilter("ignore", UserWarning)
-    
-    # Hàm chạy các bộ test cho thuật toán tìm ma trận nghịch đảo
-    AutoTestReporter.print_suite_header("Ma Trận Nghịch Đảo (Inverse)")
     passed_count = 0
     total_count = len(test_cases)
 
     for case in test_cases:
         try:
-            inv_A = inverse(case["input"])
+            inv_A = inverse(case["Ma trận A"])
             if case.get("should_raise"):
-                AutoTestReporter.print_result(case['name'], False, "Lẽ ra phải phát sinh ValueError")
+                AutoTestReporter.print_result(case['Nội dung'], False, "Lẽ ra phải phát sinh ValueError")
                 continue
                 
-            expected = case.get("expected_inv")
+            expected = case.get("expected_answer")
             if expected:
                 import numpy as np
                 assert np.allclose(inv_A, expected, atol=1e-7), "Ma trận nghịch đảo không khớp expected"
             else:
                 # Nếu không có expected cụ thể, tự nhân ngược lại với A để kiểm tra bằng hàm verify_inverse
                 # Định lý: A * A^-1 sẽ ra ma trận đơn vị I
-                assert verify_inverse(case["input"], inv_A), "AA^-1 không bằng ma trận đơn vị I"
+                assert verify_inverse(case["Ma trận A"], inv_A), "AA^-1 không bằng ma trận đơn vị I"
                 
-            AutoTestReporter.print_result(case['name'], True)
+            AutoTestReporter.print_result(case['Nội dung'], True)
             passed_count += 1
             
         except ValueError as err:
             if case.get("should_raise") == ValueError:
-                AutoTestReporter.print_result(case['name'], True, f"(Bắt đúng lỗi: {err})")
+                AutoTestReporter.print_result(case['Nội dung'], True, f"\n -> Bắt đúng lỗi: {err}")
                 passed_count += 1
             else:
-                AutoTestReporter.print_result(case['name'], False, f"(Lỗi ngoài mong đợi: {err})")
+                AutoTestReporter.print_result(case['Nội dung'], False, f"\n -> Lỗi ngoài mong đợi: {err}")
         except AssertionError as err:
-            AutoTestReporter.print_result(case['name'], False, f"(Assertion: {err})")
+            AutoTestReporter.print_result(case['Nội dung'], False, f"\n -> Lỗi ngoài mong đợi: {err}")
             
     AutoTestReporter.print_summary(passed_count, total_count)
 

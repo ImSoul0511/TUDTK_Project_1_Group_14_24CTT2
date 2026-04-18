@@ -165,9 +165,6 @@ def verify_test_verify_solution(test_cases: list[dict]):
     """
     import numpy as np
     from config import AutoTestReporter
-
-    AutoTestReporter.print_suite_header("Kiểm Chứng Nghiệm (Verify Solution)")
-    
     passed_count = 0
     total_count = len(test_cases)
 
@@ -179,22 +176,12 @@ def verify_test_verify_solution(test_cases: list[dict]):
             b_np = np.array(case['b'], dtype=float)
             x_given = np.array(case['x'], dtype=float)
 
-            if case.get("use_lstsq"):
-                Ax_given = A_np @ x_given
-                # Kiểm tra xem Ax có thực sự gần b không
-                is_close = np.allclose(Ax_given, b_np, atol=1e-9)
-                if e == is_close:
-                    AutoTestReporter.print_result(case['name'], True, f"(Khớp via lstsq, kết quả: {e})")
-                    passed_count += 1
-                else:
-                    AutoTestReporter.print_result(case['name'], False, f"(Lỗi: e trả về {e} nhưng np bảo {is_close})")
-
-            elif case.get("expect_mismatch"):
+            if case.get("expect_mismatch"):
                 if e == False: 
-                    AutoTestReporter.print_result(case['name'], True, "(Thành công: Đã nhận diện được nghiệm sai)")
+                    AutoTestReporter.print_result(case['Nội dung'], True)
                     passed_count += 1
                 else:
-                    AutoTestReporter.print_result(case['name'], False, "(Thất bại: Nghiệm sai nhưng hàm bảo đúng)")
+                    AutoTestReporter.print_result(case['Nội dung'], False)
 
             else:
                 # Trường hợp nghiệm chuẩn
@@ -205,20 +192,17 @@ def verify_test_verify_solution(test_cases: list[dict]):
                     matches_np = True # Coi như chấp nhận nếu hệ đặc biệt
                 
                 if e == matches_np:
-                    AutoTestReporter.print_result(case['name'], True, f"(Nghiệm chuẩn, kết quả: {e})")
+                    AutoTestReporter.print_result(case['Nội dung'], True)
                     passed_count += 1
                 else:
-                    AutoTestReporter.print_result(case['name'], False, f"(Lỗi: e={e}, numpy={matches_np})")
+                    AutoTestReporter.print_result(case['Nội dung'], False)
 
         except Exception as ex:
-            AutoTestReporter.print_result(case['name'], False, f"(Lỗi Runtime: {ex})")
+            AutoTestReporter.print_result(case['Nội dung'], False, f"\n-> Lỗi Runtime: {ex}")
 
     AutoTestReporter.print_summary(passed_count, total_count)
 
-
-
-
 if __name__ == "__main__":
     from test_case import *
-    verify_test_verify_solution(VERIFY_SOLUTION_TEST_CASES)
+    verify_solution(VERIFY_SOLUTION_TEST_CASES)
  
