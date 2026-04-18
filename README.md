@@ -203,19 +203,6 @@ pip install -r requirements.txt
 
 ---
 
-## **Cách chạy thử nghiệm**
-
-Bên cạnh việc cài đặt, bạn có thể chạy các kịch bản kiểm thử sau:
-
-1. **Kiểm thử Part 1**: `python part1/run_all_test.py`
-2. **Kiểm thử Part 2**:
-   - Phân rã SVD: `python part2/decomposition.py`
-   - Chéo hóa ma trận: `python part2/diagonalization.py`
-3. **Chạy Benchmark Part 3**: `python part3/benchmark.py`
-4. **Render Manim Video**: `manim -pqh part2/manim_scene_1.py Scene`
-5. **Xem demo Notebook**: Mở `part1/part1_demo.ipynb` hoặc `part3/analysis.ipynb` bằng Visual Studio Code hoặc Jupyter.
-
----
 
 ## **Tác giả & Đóng góp**
 
