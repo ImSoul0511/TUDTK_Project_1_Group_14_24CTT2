@@ -58,6 +58,8 @@ def main():
     print_section_divider("Hạng Và Cơ Sở (Rank & Basis)")
     verify_test_rank_and_basis(RANK_BASIS_TEST_CASES)
     
+    print_section_divider("Hàm Kiểm Chứng Bằng Numpy")
+    verify_test_verify_solution(VERIFY_SOLUTION_TEST_CASES)
     end_time = time.time()
     
     # TỔNG KẾT TOÀN BỘ

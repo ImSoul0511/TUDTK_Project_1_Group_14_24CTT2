@@ -1,3 +1,10 @@
+import sys
+
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8')
+
 EPSILON = 1e-15
 
 def is_zero(x):
@@ -8,7 +15,7 @@ def make_zero(x):
 
 class AutoTestReporter:
     """
-    Lớp tiện ích (Utility Class) hỗ trợ in kết quả kiểm thử (Test Results) ra Terminal.
+    Lớp hỗ trợ in kết quả kiểm thử (Test Results) ra Terminal.
     Tính năng: Định dạng màu sắc ANSI, căn lề thẳng hàng tự động và tính toán tỷ lệ tổng kết.
     """
     # Bảng màu ANSI cho Terminal
@@ -73,5 +80,3 @@ class AutoTestReporter:
             print(f"{cls.COLOR_RED}{cls.STYLE_BOLD}  TỔNG KẾT: {passed_count}/{total_count} ({percent:.1f}%) PASSED - CẦN DEBUG LẠI CODE!{cls.STYLE_RESET}\n")
 
 
-def calculate_l2_relative_error(A: list[list[float]], x_hat: list[float], b: list[float]) -> float:
-    """Tính sai số tương đối chuẩn L2 bằng NumPy"""

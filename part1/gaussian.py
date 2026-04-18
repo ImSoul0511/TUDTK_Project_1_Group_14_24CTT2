@@ -120,36 +120,6 @@ def gaussian_eliminate(A, b):
 
     return M, x, s 
 
-def verify_solution(A, b, x_custom):
-    """
-    Kiểm chứng kết quả bằng NumPy
-
-    Args:
-        A: Ma trận hệ số
-        b: Vector vế phải
-        x_custom: nghiệm
-    
-    Return:
-        True: Kết quả của bạn Khớp
-        False: Kết quả của bạn Sai
-
-    """
-    import numpy as np
-    # Xử lý kiểm tra cho trường hợp hệ vô số nghiệm / vô nghiệm (x là chuỗi hoặc x = None)
-    if isinstance(x_custom, str) or x_custom is None:
-        try:
-            np.linalg.solve(np.array(A, dtype=float), np.array(b, dtype=float))
-            return False 
-        except (np.linalg.LinAlgError, ValueError):
-            return True 
-        
-    # Dùng numpy để kiểm tra lại trường hợp có nghiệm duy nhất
-    A_np = np.array(A, dtype=float)
-    b_np = np.array(b, dtype=float)
-    x_np = np.array(x_custom, dtype=float)
-
-    # Kiểm tra xem A * x có xấp xỉ bằng b không
-    return np.allclose(np.dot(A_np, x_np), b_np)
 
 def verify_test_back_substitution(test_cases: list[dict]):
     import warnings
