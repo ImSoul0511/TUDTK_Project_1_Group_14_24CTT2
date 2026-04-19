@@ -6,8 +6,14 @@ import config
 
 def is_diagonally_dominant(A: list[list[float]]) -> bool:
     """
-    Kiểm tra ma trận có chéo trội chặt hàng không.
-    Điều kiện: |a_ii| > sum(|a_ij|) với mọi j != i
+    Kiểm tra ma trận có chéo trội chặt hàng không (Strictly Diagonally Dominant).
+    Điều kiện: |a_ii| > sum(|a_ij|) với mọi j != i.
+
+    Args:
+        A (list[list[float]]): Ma trận cần kiểm tra.
+
+    Returns:
+        bool: True nếu là ma trận chéo trội chặt hàng, False nếu ngược lại.
     """
     n = len(A)
     for i in range(n):
@@ -22,11 +28,22 @@ def is_diagonally_dominant(A: list[list[float]]) -> bool:
 
 def gauss_seidel_iteration(A: list[list[float]], b: list[float], max_iter=1000, tol=1e-9) -> list[float]:
     """
-    Cài đặt thuật toán lặp Gauss-Seidel.
-    1. Khởi tạo x = vector 0.
-    2. Lặp max_iter lần.
-    3. Trong mỗi lần lặp, cập nhật từng thành phần x_i dựa trên công thức.
-    4. Kiểm tra điều kiện dừng: Nếu ||x_new - x_old|| < tol thì break.
+    Cài đặt thuật toán lặp Gauss-Seidel để giải hệ phương trình Ax = b.
+
+    Thuật toán:
+    1. Khởi tạo vector nghiệm x = 0.
+    2. Lặp tối đa `max_iter` lần.
+    3. Trong mỗi vòng lặp, cập nhật từng thành phần x_i dựa trên các giá trị mới nhất của các ẩn khác.
+    4. Kiểm tra điều kiện dừng: Nếu chuẩn L2 của sai số ||x_new - x_old|| < tol thì đạt độ hội tụ.
+
+    Args:
+        A (list[list[float]]): Ma trận hệ số (n x n).
+        b (list[float]): Vector vế phải (n).
+        max_iter (int): Số lần lặp tối đa.
+        tol (float): Ngưỡng sai số hội tụ chấp nhận được.
+
+    Returns:
+        list[float]: Vector nghiệm x của hệ phương trình.
     """
 
     n = len(A)
@@ -55,15 +72,15 @@ def gauss_seidel_iteration(A: list[list[float]], b: list[float], max_iter=1000, 
 
 def solve_system(A: list[list[float]], b: list[float], method: str) -> list[float]:
     """
-    Hàm điều hướng (router) để chọn phương pháp giải hệ phương trình tuyến tính.
-    
+    Hàm điều hướng (router) để chọn phương pháp giải hệ phương trình tuyến tính phù hợp.
+
     Args:
-        A: Ma trận hệ số (n x n)
-        b: Vector vế phải (n)
-        method: Phương pháp giải ('gauss', 'svd', 'gauss_seidel')
+        A (list[list[float]]): Ma trận hệ số (n x n).
+        b (list[float]): Vector vế phải (n).
+        method (str): Tên phương pháp ('gauss', 'svd', 'gauss_seidel').
         
     Returns:
-        Nghiệm của hệ phương trình dưới dạng list.
+        list[float]: Nghiệm của hệ phương trình.
     """
 
     A_np = np.array(A, dtype=float)
@@ -89,3 +106,4 @@ def solve_system(A: list[list[float]], b: list[float], method: str) -> list[floa
 
     else:
         raise ValueError(f"Phương pháp {method} không hợp lệ.")
+

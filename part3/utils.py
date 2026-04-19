@@ -4,7 +4,17 @@ import numpy as np
 def compute_l2_error(x_true: list[float], x_pred: list[float]) -> float:
     """
     Tính sai số tương đối chuẩn L2 (Relative L2 Error).
-    Công thức: ||x_true - x_pred||_2 / ||x_true||_2
+    
+    Thuật toán:
+    Tính chuẩn L2 của vector sai số chia cho chuẩn L2 của vector nghiệm đúng.
+    Công thức: $||x_{true} - x_{pred}||_2 / ||x_{true}||_2$
+
+    Args:
+        x_true (list[float]): Nghiệm đúng.
+        x_pred (list[float]): Nghiệm tính được.
+
+    Returns:
+        float: Giá trị sai số tương đối (0.0 đến 1.0 hoặc cao hơn nếu sai số lớn).
     """
     x_t = np.array(x_true, dtype=float)
     x_p = np.array(x_pred, dtype=float)
