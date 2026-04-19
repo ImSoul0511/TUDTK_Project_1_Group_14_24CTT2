@@ -1,5 +1,7 @@
-import config
-from config import AutoTestReporter
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import config as cfg
 from verification import verify_inverse_numpy as verify_inverse
 
 def inverse(matrix_A):
@@ -32,7 +34,7 @@ def inverse(matrix_A):
         for i in range(k + 1, n):
             if abs(M[i][k]) > abs(M[p][k]):
                 p=i
-        if config.is_zero(M[p][k]):
+        if cfg.is_zero(M[p][k]):
             print(f"Không có pivot tại cột {k}")
             return None
         # b. Hoán đổi dòng p và dòng k nếu cần
@@ -65,7 +67,7 @@ def verify_test_inverse(test_cases: list[dict]):
         try:
             inv_A = inverse(case["Ma trận A"])
             if case.get("should_raise"):
-                AutoTestReporter.print_result(case['Nội dung'], False, "Lẽ ra phải phát sinh ValueError")
+                cfg.AutoTestReporter.print_result(case['Nội dung'], False, "Lẽ ra phải phát sinh ValueError")
                 continue
                 
             expected = case.get("expected_answer")
@@ -77,19 +79,19 @@ def verify_test_inverse(test_cases: list[dict]):
                 # Định lý: A * A^-1 sẽ ra ma trận đơn vị I
                 assert verify_inverse(case["Ma trận A"], inv_A), "AA^-1 không bằng ma trận đơn vị I"
                 
-            AutoTestReporter.print_result(case['Nội dung'], True)
+            cfg.AutoTestReporter.print_result(case['Nội dung'], True)
             passed_count += 1
             
         except ValueError as err:
             if case.get("should_raise") == ValueError:
-                AutoTestReporter.print_result(case['Nội dung'], True, f"\n -> Bắt đúng lỗi: {err}")
+                cfg.AutoTestReporter.print_result(case['Nội dung'], True, f"\n -> Bắt đúng lỗi: {err}")
                 passed_count += 1
             else:
-                AutoTestReporter.print_result(case['Nội dung'], False, f"\n -> Lỗi ngoài mong đợi: {err}")
+                cfg.AutoTestReporter.print_result(case['Nội dung'], False, f"\n -> Lỗi ngoài mong đợi: {err}")
         except AssertionError as err:
-            AutoTestReporter.print_result(case['Nội dung'], False, f"\n -> Lỗi ngoài mong đợi: {err}")
+            cfg.AutoTestReporter.print_result(case['Nội dung'], False, f"\n -> Lỗi ngoài mong đợi: {err}")
             
-    AutoTestReporter.print_summary(passed_count, total_count)
+    cfg.AutoTestReporter.print_summary(passed_count, total_count)
 
 if __name__ == "__main__":
     from test_case import INVERSE_TEST_CASES

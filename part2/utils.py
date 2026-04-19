@@ -1,5 +1,9 @@
 import math
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import config
+import numpy as np
 
 def matrix_transpose(A):
     """ Chuyển vị ma trận """
@@ -172,3 +176,35 @@ def orthogonal_matrix(eigenvectors):
     for v in eigenvectors:
         Q.append(vector_normalize(v))
     return Q 
+    
+def matrix_sub_lambda_I(A, lam):
+    """Tính ma trận (A - λI)"""
+    n = len(A)
+    res = copy_matrix(A)
+    for i in range(n):
+        res[i][i] -= lam
+    return res
+
+def _mat_max_abs_diff(A, B):
+    """Tính sai số tuyệt đối lớn nhất giữa 2 ma trận (list of lists)."""
+    A_np = np.array(A, dtype=float)
+    B_np = np.array(B, dtype=float)
+    return float(np.max(np.abs(A_np - B_np)))
+
+def _frobenius_error(A, B):
+    """Tính chuẩn Frobenius của hiệu |A - B|_F."""
+    A_np = np.array(A, dtype=float)
+    B_np = np.array(B, dtype=float)
+    return float(np.linalg.norm(A_np - B_np, 'fro'))
+
+def _mat_multiply_np(A, B):
+    """Nhân 2 ma trận (list of lists) → list of lists dùng numpy."""
+    return np.dot(np.array(A, dtype=float), np.array(B, dtype=float)).tolist()
+
+def _identity_np(n):
+    """Trả về ma trận đơn vị n×n dạng list of lists."""
+    return np.eye(n).tolist()
+
+def _sort_eigenvalues(vals):
+    """Sắp xếp danh sách trị riêng thực theo thứ tự giảm dần để so sánh."""
+    return sorted([float(v) for v in vals], reverse=True)

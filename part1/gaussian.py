@@ -1,5 +1,7 @@
-import config
-from config import AutoTestReporter
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import config as cfg
 
 def back_substitution(U, c):
     """
@@ -16,7 +18,7 @@ def back_substitution(U, c):
     x = [0.0] * n
     for i in range(n - 1, -1, -1):
         # Kiểm tra phần tử trên đường chéo chính
-        if abs(U[i][i]) < config.EPSILON:
+        if abs(U[i][i]) < cfg.EPSILON:
             return None
         x[i] = (c[i] - sum(U[i][j] * x[j] for j in range(i + 1, n))) / U[i][i]
     return x
@@ -51,7 +53,7 @@ def gaussian_eliminate(A, b):
             if abs(M[i][k]) > abs(M[p][k]):
                 p = i
 
-        if config.is_zero(M[p][k]): 
+        if cfg.is_zero(M[p][k]): 
             # Không có pivot tại cột k
             continue
         
@@ -71,7 +73,7 @@ def gaussian_eliminate(A, b):
     #Hệ vô nghiệm
     #Tồn tại dòng có vế trái bằng 0 nhưng vế phải khác 0
     for i in range(rank, row):
-        if not config.is_zero(M[i][col-1]):
+        if not cfg.is_zero(M[i][col-1]):
             raise ValueError("Hệ phương trình vô nghiệm.")
     
     # Hệ có vô số nghiệm
@@ -131,7 +133,7 @@ def verify_test_back_substitution(test_cases: list[dict]):
         try:
             x_res = back_substitution(case["Ma trận U"], case["Vector cột c"])
             if case.get("expected_answer") == ValueError:
-                AutoTestReporter.print_result(case['Nội dung'], False, "Lẽ ra phải phát sinh lỗi")
+                cfg.AutoTestReporter.print_result(case['Nội dung'], False, "Lẽ ra phải phát sinh lỗi")
                 continue
             
             expected = case.get("Nghiệm x")
@@ -143,19 +145,19 @@ def verify_test_back_substitution(test_cases: list[dict]):
                 import numpy as np
                 assert np.allclose(x_res, expected, atol=1e-7), f"got {x_res}, want {expected}"
                 
-            AutoTestReporter.print_result(case['Nội dung'], True)
+            cfg.AutoTestReporter.print_result(case['Nội dung'], True)
             passed_count += 1
             
         except ValueError as err:
             if case.get("expected_answer") == ValueError:
-                AutoTestReporter.print_result(case['Nội dung'], True, f"(Bắt đúng lỗi: {err})")
+                cfg.AutoTestReporter.print_result(case['Nội dung'], True, f"(Bắt đúng lỗi: {err})")
                 passed_count += 1
             else:
-                AutoTestReporter.print_result(case['Nội dung'], False, f"(Lỗi ngoài mong đợi: {err})")
+                cfg.AutoTestReporter.print_result(case['Nội dung'], False, f"(Lỗi ngoài mong đợi: {err})")
         except AssertionError as err:
-            AutoTestReporter.print_result(case['Nội dung'], False, f"(Assertion: {err})")
+            cfg.AutoTestReporter.print_result(case['Nội dung'], False, f"(Assertion: {err})")
             
-    AutoTestReporter.print_summary(passed_count, total_count)
+    cfg.AutoTestReporter.print_summary(passed_count, total_count)
 
 def verify_test_gaussian_eliminate(test_cases: list[dict]):
     import warnings
@@ -167,7 +169,7 @@ def verify_test_gaussian_eliminate(test_cases: list[dict]):
         try:
             M_res, x_res, swaps = gaussian_eliminate(case["Ma trận A"], case.get("Vector cột b", []))
             if case.get("expected_answer"):
-                AutoTestReporter.print_result(case['Nội dung'], False, "Lẽ ra phải phát sinh lỗi")
+                cfg.AutoTestReporter.print_result(case['Nội dung'], False, "Lẽ ra phải phát sinh lỗi")
                 continue
                 
             if case.get("expected_non_unique"):
@@ -178,26 +180,26 @@ def verify_test_gaussian_eliminate(test_cases: list[dict]):
                 if "Số lần hoán đổi" in case:
                     assert swaps == case["Số lần hoán đổi"], f"Hoán đổi sai. got {swaps}, want {case['Số lần hoán đổi']}"
             
-            AutoTestReporter.print_result(case['Nội dung'], True)
+            cfg.AutoTestReporter.print_result(case['Nội dung'], True)
             passed_count += 1
             
         except ValueError as err:
             if case.get("expected_answer") == ValueError:
-                AutoTestReporter.print_result(case['Nội dung'], True, f"\n-> Bắt đúng lỗi: {err}")
+                cfg.AutoTestReporter.print_result(case['Nội dung'], True, f"\n-> Bắt đúng lỗi: {err}")
                 passed_count += 1
             elif case.get("expected_non_unique") and "vô nghiệm" in str(err).lower():
-                AutoTestReporter.print_result(case['Nội dung'], True, f"\n-> Bắt đúng hệ vô nghiệm")
+                cfg.AutoTestReporter.print_result(case['Nội dung'], True, f"\n-> Bắt đúng hệ vô nghiệm")
                 passed_count += 1
             else:
-                AutoTestReporter.print_result(case['Nội dung'], False, f"\n-> Lỗi ngoài mong đợi: {err}")
+                cfg.AutoTestReporter.print_result(case['Nội dung'], False, f"\n-> Lỗi ngoài mong đợi: {err}")
         except Exception as err:
             if case.get("expected_answer") == type(err):
-                AutoTestReporter.print_result(case['Nội dung'], True, f"\n-> Bắt đúng lỗi: {err}")
+                cfg.AutoTestReporter.print_result(case['Nội dung'], True, f"\n-> Bắt đúng lỗi: {err}")
                 passed_count += 1
             else:
-                AutoTestReporter.print_result(case['Nội dung'], False, f"\n-> Lỗi Exception: {err}")
+                cfg.AutoTestReporter.print_result(case['Nội dung'], False, f"\n-> Lỗi Exception: {err}")
             
-    AutoTestReporter.print_summary(passed_count, total_count)
+    cfg.AutoTestReporter.print_summary(passed_count, total_count)
 
 if __name__ == "__main__":
     from test_case import BACK_SUBSTITUTION_TEST_CASES, GAUSSIAN_ELIMINATE_TEST_CASES

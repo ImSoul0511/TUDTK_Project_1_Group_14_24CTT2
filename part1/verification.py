@@ -1,7 +1,8 @@
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np
-import config
-
-
+import config as cfg
 
 def verify_solution(A, b, x_custom):
     """
@@ -70,7 +71,7 @@ def verify_inverse_numpy(matrix_A, inverse_A):
     # Kiểm tra xem inverse_A có tồn tại không (tránh lỗi khi hàm inverse tạch)
     if inverse_A is None:
         det_A = np.linalg.det(np.array(matrix_A, dtype=float))
-        if config.is_zero(det_A): 
+        if cfg.is_zero(det_A): 
             return True 
         else:
             return False 
@@ -151,7 +152,7 @@ def verify_rank_and_basis_numpy(A, rank_custom, row_basis, col_basis, null_basis
         check_null = False
     else:
         for v in null_basis:
-            if not np.allclose(np.dot(A_np, np.array(v)), 0, atol=config.EPSILON):
+            if not np.allclose(np.dot(A_np, np.array(v)), 0, atol=cfg.EPSILON):
                 check_null = False
                 break
 
@@ -204,5 +205,5 @@ def verify_test_verify_solution(test_cases: list[dict]):
 
 if __name__ == "__main__":
     from test_case import *
-    verify_solution(VERIFY_SOLUTION_TEST_CASES)
+    verify_test_verify_solution(VERIFY_SOLUTION_TEST_CASES)
  

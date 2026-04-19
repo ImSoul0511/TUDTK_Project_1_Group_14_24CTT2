@@ -1,5 +1,8 @@
-import config
-from config import AutoTestReporter
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import config as cfg
+from test_case import DETERMINANT_TEST_CASES
 
 def determinant(matrix_A):
     """
@@ -35,7 +38,7 @@ def determinant(matrix_A):
                 pivot_row = k
         
         # 2. Báo lỗi nếu cột toàn số 0 (ma trận suy biến)
-        if config.is_zero(max_val):
+        if cfg.is_zero(max_val):
             # Không có pivot tại cột i
             return 0.0
             
@@ -68,9 +71,9 @@ def verify_test_determinant(test_cases: list[dict]):
             if "should_raise" in case:
                 try:
                     d = determinant(case["Ma trận A"])
-                    AutoTestReporter.print_result(case['Nội dung'], False, "Lẽ ra phải phát sinh lỗi")
+                    cfg.AutoTestReporter.print_result(case['Nội dung'], False, "Lẽ ra phải phát sinh lỗi")
                 except case["should_raise"] as err:
-                    AutoTestReporter.print_result(case['Nội dung'], True, f"\n-> Bắt đúng lỗi: {type(err).__name__}:{err}")
+                    cfg.AutoTestReporter.print_result(case['Nội dung'], True, f"\n-> Bắt đúng lỗi: {type(err).__name__}:{err}")
                     passed_count += 1
                 continue
 
@@ -80,14 +83,14 @@ def verify_test_determinant(test_cases: list[dict]):
             
             # Sử dụng np.isclose để trị sai số dấu phẩy động (đây là điều bắt buộc khi tính toán số thực trên máy tính)
             if np.isclose(d, expected, atol=1e-7):
-                AutoTestReporter.print_result(case['Nội dung'], True, f"(det = {d:.4f})")
+                cfg.AutoTestReporter.print_result(case['Nội dung'], True, f"(det = {d:.4f})")
                 passed_count += 1
             else:
-                AutoTestReporter.print_result(case['Nội dung'], False, f"-> Tính ra: {d}, Kỳ vọng: {expected}")
+                cfg.AutoTestReporter.print_result(case['Nội dung'], False, f"-> Tính ra: {d}, Kỳ vọng: {expected}")
         except Exception as err:
-            AutoTestReporter.print_result(case['Nội dung'], False, f"-> Lỗi Runtime: {err}")
+            cfg.AutoTestReporter.print_result(case['Nội dung'], False, f"-> Lỗi Runtime: {err}")
             
-    AutoTestReporter.print_summary(passed_count, total_count)
+    cfg.AutoTestReporter.print_summary(passed_count, total_count)
 
 if __name__ == "__main__":
     from test_case import DETERMINANT_TEST_CASES

@@ -1,7 +1,12 @@
 import math
-from . import utils as ut
-from .diagonalization import eigen_decomposition
-import config
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import config as cfg
+import part2.utils as ut
+from part2.diagonalization import eigen_calculation_with_jacobi
+from part2.test_case_part2 import SVD_TEST_CASES
+from part2.verification_part2 import verify_svd_numpy
 
 def svd(A):
     """
@@ -32,7 +37,7 @@ def svd(A):
     # Phân rã ma trận ATA cho ta các Vector riêng (Cột của V) và các Trị riêng (Lambda)
     At = ut.matrix_transpose(A)
     ATA = ut.matrix_multiply(At, A)
-    lambdas_V, V = eigen_decomposition(ATA)
+    lambdas_V, V = eigen_calculation_with_jacobi(ATA)
 
     # Bước 2: Tính các giá trị kỳ dị (sigma = căn bậc hai của lambda)
     # Lọc bỏ các giá trị âm nhỏ do sai số máy tính và sắp xếp giảm dần
@@ -50,7 +55,7 @@ def svd(A):
     # Sử dụng công thức liên hệ: u_i = (1 / sigma_i) * A * v_i
     U = []
     for i in range(min(len(A), len(sigmas))):
-        if not config.is_zero(sigmas[i]): # Chỉ tính nếu giá trị kỳ dị đủ lớn (tránh nhiễu)
+        if not cfg.is_zero(sigmas[i]): # Chỉ tính nếu giá trị kỳ dị đủ lớn (tránh nhiễu)
             v_i = [V[row][i] for row in range(len(V))]
             u_i = [sum(A[r][c] * v_i[c] for c in range(len(v_i))) for r in range(len(A))]
             U.append(ut.vector_normalize(u_i))
@@ -71,30 +76,6 @@ def svd(A):
         Sigma[i][i] = sigmas[i]
     
     return ut.matrix_transpose(U), Sigma, ut.matrix_transpose(V)
-
-def verify_svd(A):
-    import numpy as np
-    A_np = np.array(A, dtype=float)
-    U, s, Vt = np.linalg.svd(A_np)
-    m, n = A_np.shape
-    Sigma = np.diag(s)
-    return U, Sigma, Vt
-
-# --- TÁI TẠO MA TRẬN TỪ KẾT QUẢ PHÂN RÃ ---
-def rebuild_matrix(U_mtx, sigmas, Vt_mtx):
-    """ Tái tạo ma trận A từ kết quả phân rã SVD """
-    # k là số lượng trị kỳ dị thực tế tìm được (ví dụ k=2)
-    k = len(sigmas)
-    
-    # Tạo Sigma là ma trận vuông (k x k)
-    Sigma_k = [[0.0 for _ in range(k)] for _ in range(k)]
-    for i in range(k):
-        Sigma_k[i][i] = sigmas[i]
-    
-    # Phép nhân: (m x k) * (k x k) * (k x n) = (m x n)
-    U_Sigma = ut.matrix_multiply(U_mtx, Sigma_k)
-    A_reconstructed = ut.matrix_multiply(U_Sigma, Vt_mtx)
-    return A_reconstructed
 
 def householder_qr_v1(A):
     """
@@ -138,7 +119,7 @@ def householder_qr_v1(A):
         # Bước 2: Tính chuẩn ||x||₂
         normx = ut.vector_norm(slice_col)
 
-        if config.is_zero(normx):
+        if cfg.is_zero(normx):
             continue 
 
         # Bước 3: Chọn dấu s = -sign(x₁), tránh triệt tiêu catastrophic
@@ -147,7 +128,7 @@ def householder_qr_v1(A):
         # Bước 4: Tính u₁ = x₁ - s * normx
         u1 = R[j][j] - s * normx 
 
-        if config.is_zero(u1):   
+        if cfg.is_zero(u1):   
             continue 
             
         # Bước 5: Xây dựng vector phản xạ w = x / u₁, chuẩn hóa w[0] = 1
@@ -187,8 +168,105 @@ def householder_qr_v1(A):
     
     return Q, R
 
-def verify_qr(A):
-    import numpy as np
-    A_np = np.array(A, dtype=float)
-    Q, R = np.linalg.qr(A_np)
-    return Q, R
+def run_svd_tests(test_cases: list[dict]):
+    """
+    Chạy toàn bộ test cases cho thuật toán SVD tự cài đặt.
+
+    Với mỗi test case sẽ in:
+      - Tên test case
+      - Trạng thái PASS / FAIL
+      - Sai số tái tạo, sai số trực giao U, sai số trực giao Vt
+      - (Nếu có expected_sigmas) Sai số so với numpy
+    """
+    SEP = "=" * 95
+    HDR = "-" * 95
+
+    print(f"\n{SEP}")
+    print(f"  KIỂM CHỨNG THUẬT TOÁN: SVD (Singular Value Decomposition) — Tự cài đặt vs NumPy")
+    print(SEP)
+
+    col_name    = 38
+    col_rebuild = 16
+    col_orth_u  = 16
+    col_orth_v  = 16
+    col_status  = 8
+
+    header = (
+        f"{'Test Case':<{col_name}}"
+        f"{'Err Tái tạo':>{col_rebuild}}"
+        f"{'Err Orth(U)':>{col_orth_u}}"
+        f"{'Err Orth(Vt)':>{col_orth_v}}"
+        f"{'Kết quả':>{col_status}}"
+    )
+    print(header)
+    print(HDR)
+
+    passed_count = 0
+    total_count  = len(test_cases)
+
+    for case in test_cases:
+        name = case["Nội dung"]
+        A    = case["Ma trận A"]
+
+        try:
+            ok, r_err, u_err, v_err, sigmas = verify_svd_numpy(A)
+
+            # Nếu có expected_sigmas thì kiểm tra thêm
+            if "expected_sigmas" in case:
+                expected = sorted(case["expected_sigmas"], reverse=True)
+                got      = sorted(sigmas, reverse=True)
+
+                # So sánh từng giá trị
+                sigma_ok = len(expected) == len(got) and all(
+                    abs(e - g) < 1e-4
+                    for e, g in zip(expected, got)
+                )
+                sigma_err = max(
+                    abs(e - g)
+                    for e, g in zip(
+                        sorted(expected, reverse=True),
+                        sorted(got,      reverse=True)
+                    )
+                ) if len(expected) == len(got) else float('inf')
+
+                ok = ok and sigma_ok
+                sigma_note = f"  sigma-err={sigma_err:.2e}"
+            elif "expected_rank" in case:
+                expected_rank = case["expected_rank"]
+                actual_rank   = sum(1 for s in sigmas if s > 1e-6)
+                ok = ok and (actual_rank == expected_rank)
+                sigma_note = f"  rank={actual_rank}(exp={expected_rank})"
+            else:
+                sigma_note = ""
+
+            status = "[OK]  " if ok else "[FAIL]"
+            if ok:
+                passed_count += 1
+
+            name_str = (name[:col_name - 2] + "..") if len(name) > col_name else name
+            print(
+                f"{name_str:<{col_name}}"
+                f"{r_err:>{col_rebuild}.2e}"
+                f"{u_err:>{col_orth_u}.2e}"
+                f"{v_err:>{col_orth_v}.2e}"
+                f"{status:>{col_status}}"
+                f"{sigma_note}"
+            )
+
+        except Exception as ex:
+            status = "[FAIL]"
+            name_str = (name[:col_name - 2] + "..") if len(name) > col_name else name
+            print(
+                f"{name_str:<{col_name}}"
+                f"{'N/A':>{col_rebuild}}"
+                f"{'N/A':>{col_orth_u}}"
+                f"{'N/A':>{col_orth_v}}"
+                f"{status:>{col_status}}"
+                f"  -> Lỗi: {ex}"
+            )
+
+    print(HDR)
+    cfg._print_summary_table(passed_count, total_count)
+
+if __name__ == "__main__":
+    run_svd_tests(SVD_TEST_CASES)
