@@ -144,7 +144,7 @@ SVD_TEST_CASES = [
 #   - Trị riêng: D[i][i] so sánh với np.linalg.eig (không phụ thuộc thứ tự)
 #   - should_raise: True nếu hàm phải ném ValueError
 # ----------------------------------------------------------------------------
-DIAGONALIZE_QR_TEST_CASES = [
+DIAGONALIZATION_TEST_CASES = [
     {
         "Nội dung": "Ma trận 2x2 đối xứng cơ bản",
         "Ma trận A": [
@@ -178,7 +178,7 @@ DIAGONALIZE_QR_TEST_CASES = [
             [-2.0,  4.0, -2.0],
             [ 1.0, -2.0,  4.0],
         ],
-        "expected_eigenvalues": [7.0, 4.0, 1.0],
+        "expected_eigenvalues": [7.372281323269014, 3.0, 1.6277186767309864],
     },
     {
         "Nội dung": "Ma trận 3x3 tam giác trên",
@@ -207,7 +207,7 @@ DIAGONALIZE_QR_TEST_CASES = [
             [-1.0,  0.0,  4.0,  1.0],
             [ 0.0, -1.0,  1.0,  3.0],
         ],
-        "expected_eigenvalues": [5.732050808056875, 3.732050808056875, 2.267949191943125, 2.267949191943125],
+        "expected_eigenvalues": [5.618033988749897, 3.618033988749895, 3.381966011250105, 1.3819660112501055],
     },
     {
         "Nội dung": "Ma trận đơn vị 3x3 (tất cả trị riêng = 1)",

@@ -1,5 +1,7 @@
-import config
-from config import AutoTestReporter
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import config as cfg
 
 def rank_and_basis(matrix_A):
     """
@@ -37,7 +39,7 @@ def rank_and_basis(matrix_A):
             if abs(M[i][j]) > abs(M[max_row][j]):
                 max_row = i
 
-        if config.is_zero(M[max_row][j]):
+        if cfg.is_zero(M[max_row][j]):
             # Không có pivot tại cột j
             continue
 
@@ -99,15 +101,15 @@ def verify_test_rank_and_basis(test_cases: list[dict]):
             if case.get("null_is_empty"):
                 assert len(n_basis) == 0, "Không gian nghiệm lẽ ra phải rỗng"
                 
-            AutoTestReporter.print_result(case['Nội dung'], True)
+            cfg.AutoTestReporter.print_result(case['Nội dung'], True)
             passed_count += 1
             
         except AssertionError as err:
-            AutoTestReporter.print_result(case['Nội dung'], False, f"(Assertion: {err})")
+            cfg.AutoTestReporter.print_result(case['Nội dung'], False, f"(Assertion: {err})")
         except Exception as err:
-            AutoTestReporter.print_result(case['Nội dung'], False, f"(Lỗi Runtime: {err})")
+            cfg.AutoTestReporter.print_result(case['Nội dung'], False, f"(Lỗi Runtime: {err})")
             
-    AutoTestReporter.print_summary(passed_count, total_count)
+    cfg.AutoTestReporter.print_summary(passed_count, total_count)
 
 if __name__ == "__main__":
     from test_case import RANK_BASIS_TEST_CASES

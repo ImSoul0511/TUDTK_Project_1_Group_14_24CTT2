@@ -1,9 +1,16 @@
 import math
-from . import utils as ut
-import config
+import random 
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import part2.utils as ut
+import config as cfg 
+from part2.verification_part2 import verify_diagonalize_numpy 
+from part2.test_case_part2 import DIAGONALIZATION_TEST_CASES
+from part1.gaussian import gaussian_eliminate
 
 # Dùng thuật toán Jacobi để tìm toàn bộ vector riêng 
-def eigen_decomposition(M, iterations=100):
+def eigen_calculation_with_jacobi(M, iterations=100):
     """
     Sử dụng phương pháp xoay Jacobi để 'chéo hóa' ma trận đối xứng M.
     Đây là cách máy tính thay thế việc giải phương trình det(M - lambda*I) = 0.
@@ -25,7 +32,7 @@ def eigen_decomposition(M, iterations=100):
                     p, q = i, j
 
         # Nếu mọi phần tử ngoài đường chéo đã gần bằng 0, coi như ma trận đã chéo hóa xong
-        if config.is_zero(max_val): break
+        if cfg.is_zero(max_val): break
 
         # Tính góc xoay Jacobi (theta) để triệt tiêu phần tử A[p][q]
         theta = 0.5 * math.atan2(2 * A[p][q], A[q][q] - A[p][p])
@@ -57,81 +64,18 @@ def eigen_decomposition(M, iterations=100):
     eigenvalues = [A[i][i] for i in range(n)]
     return eigenvalues, V
 
-def matrix_sub_lambda_I(A, lam):
-    """Tính ma trận (A - λI)"""
-    n = len(A)
-    res = ut.copy_matrix(A)
-    for i in range(n):
-        res[i][i] -= lam
-    return res
-
-def get_null_space(A):
+def eigen_calculation_reverse_iteration(A, max_iterations=500, tol=1e-7):
     """
-    Tìm cơ sở không gian rỗng của ma trận A (giải hệ Ax = 0).  
+    Tính toán Trị riêng và Vector riêng thông qua 2 bước:
+    1. Dùng QR phân rã để tìm các Trị riêng xấp xỉ.
+    2. Dùng Inverse Iteration (Lặp ngược) để tìm Vector riêng và làm mịn Trị riêng.
     """
-    # Tạo bản sao để không làm hỏng ma trận gốc
-    M = ut.copy_matrix(A)
-    row = len(M)
-    col = len(M[0])
-
-    pivot_cols = []   
-    current_row = 0
-
-    # 1. Khử Gauss để đưa về dạng bậc thang (Row Echelon Form)
-    for k in range(col):
-        if current_row >= row:
-            break
-
-        # Tìm pivot
-        p = current_row
-        for i in range(current_row + 1, row):
-            if abs(M[i][k]) > abs(M[p][k]):
-                p = i
-
-        if config.is_zero(M[p][k]): 
-            continue
-        
-        if p != current_row:
-            M[current_row], M[p] = M[p], M[current_row]
-            
-        pivot_cols.append(k)
-        
-        for i in range(current_row + 1, row):
-            l_ik = M[i][k] / M[current_row][k]
-            M[i][k] = 0
-            for j in range(k + 1, col):
-                M[i][j] -= l_ik * M[current_row][j]
-        current_row += 1
-
-    rank = len(pivot_cols)
-
-    # 2. Tìm cơ sở không gian nghiệm (null_basis)
-    free_cols = [j for j in range(col) if j not in pivot_cols]
-    null_basis = []
-    
-    for f in free_cols:
-        v = [0.0] * col
-        v[f] = 1.0  # Bật ẩn tự do = 1
-        
-        # Thế ngược để tìm các ẩn chốt
-        for i in range(rank - 1, -1, -1):
-            p_col = pivot_cols[i]
-            s_val = sum(M[i][j] * v[j] for j in range(p_col + 1, col))
-            v[p_col] = -s_val / M[i][p_col]
-            
-        norm = ut.vector_norm(v)
-        if norm > config.EPSILON:
-            v = [x / norm for x in v]
-            
-        null_basis.append(v)
-
-    return null_basis
-
-def eigen_decomposition_with_qr(A, max_iterations=500):
     from .decomposition import householder_qr_v1
+    
     Ak = ut.copy_matrix(A)
     n = len(Ak)
     
+    # --- Tìm trị riêng xấp xỉ bằng thuật toán QR ---
     for _ in range(max_iterations):
         Q, R = householder_qr_v1(Ak)
         Ak = ut.matrix_multiply(R, Q)
@@ -140,32 +84,80 @@ def eigen_decomposition_with_qr(A, max_iterations=500):
         off_diag_sum = sum(abs(Ak[i][j]) for i in range(1, n) for j in range(i))
         
         # Nếu đã đủ "phẳng" (trở thành ma trận tam giác), thì dừng
-        if config.is_zero(off_diag_sum):
+        if cfg.is_zero(off_diag_sum):
             break
-    
-    # Tìm vector riêng
-    eigenvalues = [Ak[i][i] for i in range(n)]
+            
+    # Trích xuất các trị riêng xấp xỉ trên đường chéo
+    approx_eigenvalues = [Ak[i][i] for i in range(n)]
 
-    # Gộp các trị riêng trùng lặp (trị riêng bội)
+    # Lọc ra các trị riêng duy nhất
     unique_eigenvalues = []
-    for lam in eigenvalues:
-        if not any(config.is_zero(lam - u) for u in unique_eigenvalues):
+    for lam in approx_eigenvalues:
+        if not any(cfg.is_zero(lam - u) for u in unique_eigenvalues):
             unique_eigenvalues.append(lam)
-    P_cols = []
+
+    # --- Tìm vector riêng & làm mịn bằng lặp ngược ---
     final_eigenvalues = []
+    P_cols = []
+
+    # Hàm helper thực hiện lặp ngược cho từng nhóm trị riêng
+    def _inverse_iteration(lam_approx, multiplicity):
+        eps = 1e-10
+        B = ut.matrix_sub_lambda_I(A, lam_approx + eps)
+        
+        eigenvecs = []
+        refined_lams = []
+        
+        for _ in range(multiplicity):
+            x = [random.random() for _ in range(n)]
+            x = ut.vector_normalize(x)
+            
+            for _ in range(30): # max_iter của lặp ngược
+                try:
+                    _, y, _ = gaussian_eliminate(B, x)
+                except ValueError:
+                    y = x 
+                    
+                # Trực giao hóa (Gram-Schmidt) cho nghiệm kép
+                for v in eigenvecs:
+                    scalar = ut.dot_product(y, v)
+                    y = ut.subtract_vectors(y, v, scalar)
+                    
+                x_new = ut.vector_normalize(y)
+                
+                # Kiểm tra hội tụ
+                diff1 = max(abs(x_new[i] - x[i]) for i in range(n))
+                diff2 = max(abs(x_new[i] + x[i]) for i in range(n))
+                
+                x = x_new
+                if min(diff1, diff2) < tol:
+                    break
+                    
+            # Tinh chỉnh trị riêng bằng Thương số Rayleigh
+            Ax = [sum(A[i][j] * x[j] for j in range(n)) for i in range(n)]
+            lam_refined = ut.dot_product(x, Ax)
+            
+            eigenvecs.append(x)
+            refined_lams.append(lam_refined)
+            
+        return eigenvecs, refined_lams
+
+    # Duyệt qua từng trị riêng duy nhất để tiến hành lặp ngược
     for lam in unique_eigenvalues:
-        B = matrix_sub_lambda_I(A, lam)
+        # Đếm bội số đại số (multiplicity) của trị riêng này
+        multiplicity = sum(1 for val in approx_eigenvalues if cfg.is_zero(val - lam))
         
-        # Tìm Không gian rỗng bằng Khử Gauss-Jordan (tốt hơn back_substitution)
-        basis = get_null_space(B)
+        # Gọi hàm lặp ngược
+        found_vectors, refined_lams = _inverse_iteration(lam, multiplicity)
         
-        for v in basis:
-            P_cols.append(v)
-            final_eigenvalues.append(lam) # Ánh xạ trị riêng tương ứng với vector
-    
+        # Đổ kết quả vào mảng tổng
+        for i in range(len(found_vectors)):
+            P_cols.append(found_vectors[i])
+            final_eigenvalues.append(refined_lams[i])
+
     return final_eigenvalues, P_cols
 
-def diagonalize_with_qr(A):
+def diagonalize(A):
     """
     Thực hiện chéo hóa ma trận A = PDP^-1 bằng thuật toán lặp QR.
     Returns:
@@ -182,7 +174,7 @@ def diagonalize_with_qr(A):
         raise ValueError("Ma trận A phải là ma trận vuông để thực hiện chéo hóa.")
 
     # 1. Tìm giá trị riêng và vector riêng
-    eigenvalues, P_cols = eigen_decomposition_with_qr(A)
+    eigenvalues, P_cols = eigen_calculation_reverse_iteration(A)
 
     if len(P_cols) < n:
         raise ValueError("Ma trận A không thể chéo hóa (thiếu hụt vector riêng - defective matrix).")
@@ -202,41 +194,119 @@ def diagonalize_with_qr(A):
 
     return P, D, P_inv
 
-def diagonalize(A):
+def run_diagonalize_tests(test_cases: list[dict]):
     """
-    Thực hiện chéo hóa ma trận A = PDP^-1 bằng thuật toán Jacobi.
-    Returns:
-        P: Ma trận các vector riêng (cột)
-        D: Ma trận đường chéo chứa các giá trị riêng
-        P_inv: Ma trận nghịch đảo của P
-    Raises:
-        ValueError: Nếu A không phải ma trận vuông.
-        ValueError: Nếu A không đối xứng (Jacobi chỉ hoạt động với ma trận đối xứng).
-        ValueError: Nếu A không thể chéo hóa (ma trận thiếu hụt - P suy biến).
+    Chạy toàn bộ test cases cho thuật toán Chéo hóa lặp QR tự cài đặt.
+
+    Với mỗi test case sẽ in:
+      - Tên test case
+      - Trạng thái PASS / FAIL
+      - Sai số tái tạo A = P*D*P_inv
+      - Sai số trị riêng so với numpy (max absolute error)
     """
-    # Kiểm tra ma trận vuông
-    n = len(A)
-    if n == 0 or any(len(row) != n for row in A):
-        raise ValueError("Ma trận A phải là ma trận vuông để thực hiện chéo hóa.")
+    SEP = "=" * 90
+    HDR = "-" * 90
 
-    # Kiểm tra ma trận đối xứng (điều kiện để Jacobi hoạt động đúng)
-    for i in range(n):
-        for j in range(i + 1, n):
-            if not config.is_zero(A[i][j] - A[j][i]):
-                raise ValueError(f"Thuật toán Jacobi chỉ áp dụng cho ma trận đối xứng. A[{i}][{j}]={A[i][j]} ≠ A[{j}][{i}]={A[j][i]}.")
+    print(f"\n{SEP}")
+    print(f"  KIỂM CHỨNG THUẬT TOÁN: Chéo hóa lặp QR (diagonalize_with_qr) — Tự cài đặt vs NumPy")
+    print(SEP)
 
-    # 1. Tìm giá trị riêng và vector riêng bằng phương pháp Jacobi
-    eigenvalues, P = eigen_decomposition(A)
+    col_name    = 44
+    col_rebuild = 20
+    col_eig     = 18
+    col_status  = 8
 
-    # 2. Tạo ma trận đường chéo D
-    D = [[0.0] * n for _ in range(n)]
-    for i in range(n):
-        D[i][i] = eigenvalues[i]
+    header = (
+        f"{'Test Case':<{col_name}}"
+        f"{'Err Tái tạo A':>{col_rebuild}}"
+        f"{'Err Trị riêng':>{col_eig}}"
+        f"{'Kết quả':>{col_status}}"
+    )
+    print(header)
+    print(HDR)
 
-    # Kiểm tra P có khả nghịch không (dấu hiệu ma trận có thể chéo hóa)
-    try:
-        P_inv = ut.matrix_inverse(P)
-    except ValueError:
-        raise ValueError("Ma trận A không thể chéo hóa: các vector riêng không độc lập tuyến tính (ma trận thiếu hụt).")
+    passed_count = 0
+    total_count  = len(test_cases)
 
-    return P, D, P_inv
+    for case in test_cases:
+        name = case["Nội dung"]
+        A    = case["Ma trận A"]
+
+        try:
+            # Trường hợp mong đợi ném ngoại lệ
+            if case.get("should_raise"):
+                try:
+                    diagonalize(A)
+                    # Không ném => FAIL
+                    status = "[FAIL]"
+                    name_str = (name[:col_name - 2] + "..") if len(name) > col_name else name
+                    print(
+                        f"{name_str:<{col_name}}"
+                        f"{'N/A':>{col_rebuild}}"
+                        f"{'N/A':>{col_eig}}"
+                        f"{status:>{col_status}}"
+                        f"  -> Lẽ ra phải ném {case['should_raise'].__name__}"
+                    )
+                except case["should_raise"]:
+                    passed_count += 1
+                    status = "[OK]  "
+                    name_str = (name[:col_name - 2] + "..") if len(name) > col_name else name
+                    print(
+                        f"{name_str:<{col_name}}"
+                        f"{'N/A':>{col_rebuild}}"
+                        f"{'N/A':>{col_eig}}"
+                        f"{status:>{col_status}}"
+                        f"  (Bắt đúng {case['should_raise'].__name__})"
+                    )
+                except Exception as ex:
+                    status = "[FAIL]"
+                    name_str = (name[:col_name - 2] + "..") if len(name) > col_name else name
+                    print(
+                        f"{name_str:<{col_name}}"
+                        f"{'N/A':>{col_rebuild}}"
+                        f"{'N/A':>{col_eig}}"
+                        f"{status:>{col_status}}"
+                        f"  -> Lỗi ngoài mong đợi: {ex}"
+                    )
+                continue
+
+            # Trường hợp thông thường
+            ok, r_err, eig_err, eigenvalues = verify_diagonalize_numpy(A)
+
+            # Kiểm tra thêm expected_eigenvalues nếu có
+            if "expected_eigenvalues" in case:
+                expected = ut._sort_eigenvalues(case["expected_eigenvalues"])
+                got      = eigenvalues  # đã được sort_eigenvalues rồi
+                len_ok   = len(expected) == len(got) and all(
+                    abs(e - g) < 1e-5 for e, g in zip(expected, got)
+                )
+                ok = ok and len_ok
+
+            if ok:
+                passed_count += 1
+
+            status   = "[OK]  " if ok else "[FAIL]"
+            name_str = (name[:col_name - 2] + "..") if len(name) > col_name else name
+            print(
+                f"{name_str:<{col_name}}"
+                f"{r_err:>{col_rebuild}.2e}"
+                f"{eig_err:>{col_eig}.2e}"
+                f"{status:>{col_status}}"
+            )
+
+        except Exception as ex:
+            status   = "[FAIL]"
+            name_str = (name[:col_name - 2] + "..") if len(name) > col_name else name
+            print(
+                f"{name_str:<{col_name}}"
+                f"{'N/A':>{col_rebuild}}"
+                f"{'N/A':>{col_eig}}"
+                f"{status:>{col_status}}"
+                f"  -> Lỗi: {ex}"
+            )
+
+    print(HDR)
+    cfg._print_summary_table(passed_count, total_count)
+
+if __name__ == "__main__":
+    run_diagonalize_tests(DIAGONALIZATION_TEST_CASES)

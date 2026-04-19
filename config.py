@@ -1,6 +1,6 @@
 from IPython.display import display, Markdown
 
-EPSILON = 1e-15
+EPSILON = 1e-12
 
 def is_zero(x):
     return abs(x) < EPSILON
@@ -50,6 +50,16 @@ class AutoTestReporter:
         else:
             display(Markdown(f"### Kết luận: Chỉ {passed_count}/{total_count} ({percent:.1f}%) đã hoàn thành\n"))
 
-
-def calculate_l2_relative_error(A: list[list[float]], x_hat: list[float], b: list[float]) -> float:
-    """Tính sai số tương đối chuẩn L2 bằng NumPy"""
+def _print_summary_table(passed: int, total: int):
+    """In dòng tổng kết theo format nhất quán với part1."""
+    if total == 0:
+        print("  [!] Không có test case nào.\n")
+        return
+    percent = passed / total * 100
+    if passed == total:
+        verdict = "TẤT CẢ ĐẠT"
+    elif passed >= total * 0.8:
+        verdict = "ĐẠT (còn lỗi nhỏ)"
+    else:
+        verdict = "CẦN KIỂM TRA LẠI"
+    print(f"\n  Kết luận: {passed}/{total} test ({percent:.0f}%)  —  {verdict}\n")
