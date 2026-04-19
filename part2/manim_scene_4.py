@@ -358,27 +358,29 @@ class Scene4_SVD(ThreeDScene):
 
         # Hiển thị phân tách: Σ = D · I_rect
         sig_decomp = MathTex(
-            r"\Sigma", "=",
-            bmatrix(D_tex),          # index 2 → D
+            r"\Sigma", "=", "{}",
+            bmatrix(D_tex),          # index 3 → D
             r"\cdot",
-            bmatrix(I_rect_tex),     # index 4 → I_rect
+            bmatrix(I_rect_tex),     # index 5 → I_rect
             font_size=22,
         ).set_z_index(25)
         sig_decomp[0].set_color(YELLOW)
-        sig_decomp[2].set_color(YELLOW)
-        sig_decomp[4].set_color(TEAL)
+        sig_decomp[3].set_color(YELLOW)
+        sig_decomp[5].set_color(TEAL)
         
-        # Position it, but don't add to fixed_in_frame yet to avoid duplicate rendering/glitch
         sig_decomp.next_to(frame_box, DOWN, buff=0.18)
+        # Đăng ký vào lớp 2D nhưng tạm xóa khỏi cảnh để tránh hiện đè
         self.add_fixed_in_frame_mobjects(sig_decomp)
-        sig_decomp.set_opacity(0)
+        self.remove(sig_decomp) 
 
         self.play(
             FadeOut(t3_intro), 
-            ReplacementTransform(sig_full, sig_decomp), 
-            sig_decomp.animate.set_opacity(1),
-            run_time=1.2
+            FadeOut(sig_full),
+            FadeIn(sig_decomp),
+            run_time=1.5
         )
+
+
         self.wait(0.5)
 
         t3a = title_text(
@@ -388,8 +390,8 @@ class Scene4_SVD(ThreeDScene):
 
         # Highlight I_rect trong phương trình
         hl_irec = SurroundingRectangle(
-            sig_decomp[4], color=TEAL, buff=0.08
-        ).set_z_index(25)
+            sig_decomp[5], color=TEAL, buff=0.08
+        ).set_z_index(25)   
         _fix(hl_irec)
         self.play(Create(hl_irec), run_time=0.4)
 
@@ -414,7 +416,7 @@ class Scene4_SVD(ThreeDScene):
 
         # Highlight D trong phương trình
         hl_d = SurroundingRectangle(
-            sig_decomp[2], color=YELLOW, buff=0.08
+            sig_decomp[3], color=YELLOW, buff=0.08
         ).set_z_index(25)
         _fix(hl_d)
 
@@ -519,3 +521,61 @@ class Scene4_SVD(ThreeDScene):
             run_time=1.5,
         )
         self.wait(0.5)
+
+
+class Scene4_Summary(Scene):
+    def construct(self):
+        # ── Title ─────────────────────────────────────────────────────────────
+        title = Text("Tổng kết về phân rã SVD", font_size=40, color=GOLD)
+        title.to_edge(UP, buff=0.8)
+
+        # ── Introduction text ────────────────────────────────────────────────
+        intro_txt = (
+            "Như vậy, từ bất kỳ ma trận ban đầu nào, ta có thể tách nó thành 3 ma trận\n"
+            "có các ảnh hưởng đặc biệt lên không gian:"
+        )
+        intro = Text(intro_txt, font_size=20, line_spacing=1.2).next_to(title, DOWN, buff=1)
+
+        # ── Detailed breakdown points ────────────────────────────────────────
+        # We combine Text and MathTex to handle Vietnamese and symbols together
+        
+        # Point 1: V^T
+        v_part = VGroup(
+            Text("- Ma trận ", font_size=20),
+            MathTex("V^T", color=RED, font_size=38),
+            Text(": xoay các vector riêng về cơ sở chuẩn của không gian.", font_size=20)
+        ).arrange(RIGHT, buff=0.1)
+
+        # Point 2: Sigma
+        s_part = VGroup(
+            Text("- Ma trận ", font_size=20),
+            MathTex(r"\Sigma", color=YELLOW, font_size=38),
+            Text(": hiệu chỉnh chiều và kéo giãn theo các trục chính.", font_size=20)
+        ).arrange(RIGHT, buff=0.1)
+
+        # Point 3: U
+        u_part = VGroup(
+            Text("- Ma trận ", font_size=20),
+            MathTex("U", color=BLUE, font_size=38),
+            Text(": xoay không gian về lại theo hướng của vector riêng.", font_size=20)
+        ).arrange(RIGHT, buff=0.1)
+
+        # Group all points and align them
+        summary_bullets = VGroup(v_part, s_part, u_part).arrange(DOWN, aligned_edge=LEFT, buff=0.6)
+        summary_bullets.next_to(intro, DOWN, buff=1)
+
+        # ── Animations ───────────────────────────────────────────────────────
+        self.play(Write(title))
+        self.wait(0.5)
+        self.play(FadeIn(intro, shift=UP))
+        self.wait(1)
+
+        for part in summary_bullets:
+            self.play(FadeIn(part, shift=RIGHT))
+            self.wait(2)
+
+        self.wait(3)
+        
+        # Final cleanup
+        self.play(FadeOut(VGroup(title, intro, summary_bullets)))
+        self.wait(1)

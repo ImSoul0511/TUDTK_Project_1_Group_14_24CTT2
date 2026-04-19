@@ -584,4 +584,4 @@ class Scene3_Conclusion(MovingCameraScene):
             self.play(FadeIn(line, shift=UP), run_time=0.8)
             self.wait(0.5)
             
-        self.wait(4)
+        self.wait(8)
