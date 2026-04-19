@@ -10,7 +10,21 @@ from part3.generate_data import generate_random_system, generate_hilbert_matrix,
 
 def measure_execution_metrics():
     """
-    Đo thời gian và sai số của 3 thuật toán với n thay đổi.
+    Đo thời gian execution và sai số L2 tương đối của 3 thuật toán với các kích thước n khác nhau.
+
+    Args:
+        None
+
+    Returns:
+        dict: Kết quả thực nghiệm có cấu trúc:
+            {
+                'method_name': {
+                    n (int): {
+                        'time_ms': float,       # Thời gian thực thi trung bình (ms)
+                        'relative_error': float # Sai số L2 tương đối (Relative L2 Error)
+                    }
+                }
+            }
     """
     size = [50, 100, 200, 500, 1000]
     methods = ['gauss', 'svd', 'gauss_seidel']
@@ -51,7 +65,23 @@ def measure_execution_metrics():
 
 def measure_condition_stability():
     """
-    Đo lường độ ổn định trên ma trận Hilbert và SPD.
+    Đo lường mức độ ổn định số học của các thuật toán trên ma trận Hilbert và SPD.
+
+    Args:
+        None
+
+    Returns:
+        dict: Kết quả phân tích độ ổn định có cấu cấu trúc:
+            {
+                'hilbert' | 'spd': {
+                    'n' (str): {
+                        'condition_number': float,
+                        'errors': {
+                            'method_name': float | "FAILED" # Sai số L2 tương đối hoặc "FAILED" nếu lỗi
+                        }
+                    }
+                }
+            }
     """
 
     sizes = [5, 10, 15, 20, 50] 
