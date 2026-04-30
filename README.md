@@ -37,36 +37,40 @@ Dự án xoay quanh 3 mục tiêu chính:
 ```text
 Singular-Value-Decomposition/
 ├── part1/                          # Phép khử Gauss & Nền tảng
-│   ├── gaussian.py                  # Thuật toán khử Gauss & Thế ngược
-│   ├── determinant.py               # Thuật toán tính định thức (det)
-│   ├── inverse.py                   # Thuật toán tìm ma trận nghịch đảo
-│   ├── rank_basis.py                # Tính hạng & các không gian con
-│   ├── verification.py              # Hệ thống kiểm chứng (NumPy)
-│   ├── test_case.py                 # Dữ liệu kiểm thử mẫu
-│   └── part1_demo.ipynb             # Notebook trình diễn Part 1
+│   ├── __init__.py                 # Khai báo package Part 1
+│   ├── gaussian.py                 # Thuật toán khử Gauss & Thế ngược
+│   ├── determinant.py              # Thuật toán tính định thức (det)
+│   ├── inverse.py                  # Thuật toán tìm ma trận nghịch đảo
+│   ├── rank_basis.py               # Tính hạng & các không gian con
+│   ├── verification.py             # Hệ thống kiểm chứng (NumPy)
+│   ├── test_case.py                # Dữ liệu kiểm thử mẫu
+│   └── part1_demo.ipynb            # Notebook trình diễn Part 1
 ├── part2/                          # Chéo hóa & SVD
-│   ├── decomposition.py             # Cài đặt SVD Scratch
-│   ├── diagonalization.py           # Thuật toán Jacobi & QR
-│   ├── verification_part2.py        # Kiểm chứng Part 2 bằng NumPy
-│   ├── test_case_part2.py           # Dữ liệu kiểm thử Part 2
-│   ├── utils.py                     # Tiện ích toán học cho Part 2
-│   ├── manim_scene_1.py             # Cảnh 1: Giải phẫu sự hỗn loạn
-│   ├── manim_scene_2.py             # Cảnh 2: Trực quan hóa 2D/3D & Sigma
-│   ├── manim_scene_3.py             # Cảnh 3: Thuật toán & Toán học SVD
-│   ├── manim_scene_4.py             # Cảnh 4: SVD vs Diagonalization
-│   ├── data.json                    # Dữ liệu cấu hình phụ cho Manim
-│   └── movie.py                     # Script ghép nối video Manim
+│   ├── __init__.py                 # Khai báo package Part 2
+│   ├── decomposition.py            # Cài đặt SVD Scratch
+│   ├── diagonalization.py          # Thuật toán Jacobi & QR
+│   ├── verification_part2.py       # Kiểm chứng Part 2 bằng NumPy
+│   ├── test_case_part2.py          # Dữ liệu kiểm thử Part 2
+│   ├── utils.py                    # Tiện ích toán học cho Part 2
+│   ├── manim_scene_1.py            # Cảnh 1: Thuật toán chéo hóa và trực quan hóa 
+│   ├── manim_scene_2.py            # Cảnh 2: Ma trận Sigma trong SVD
+│   ├── manim_scene_3.py            # Cảnh 3: Ma trận U và V^T trong SVD
+│   ├── manim_scene_4.py            # Cảnh 4: Thuật toán SVD và trực quan hóa
+│   ├── manim_scene_5.py            # Cảnh 5: Ứng dụng nén ảnh của SVD
+│   ├── data.json                   # Dữ liệu cấu hình phụ cho Manim
+│   └── movie.py                    # Script ghép nối video Manim
 ├── part3/                          # Benchmark & Thực nghiệm
-│   ├── benchmark.py                 # Thực nghiệm hiệu năng & ổn định
-│   ├── solvers.py                   # Gauss-Seidel & Solver router
-│   ├── generate_data.py             # Sinh dữ liệu Hilbert & SPD
-│   ├── utils.py                     # Tính sai số chuẩn L2
-│   ├── analysis.ipynb               # Phân tích thực nghiệm & Đồ thị
-│   └── benchmark_results.json       # Lưu trữ dữ liệu thực nghiệm thô
-├── report/                          # Thư mục báo cáo (Typst)
-│   ├── report.pdf                   # File báo cáo PDF chính thức
-│   ├── report.typ                   # File nguồn Typst
-│   └── assets/                      # Thư mục chứa hình ảnh minh họa
+│   ├── __init__.py                 # Khai báo package Part 3
+│   ├── benchmark.py                # Thực nghiệm hiệu năng & ổn định
+│   ├── solvers.py                  # Gauss-Seidel & Solver router
+│   ├── generate_data.py            # Sinh dữ liệu Hilbert & SPD
+│   ├── utils.py                    # Tính sai số chuẩn L2
+│   ├── analysis.ipynb              # Phân tích thực nghiệm & Đồ thị
+│   └── benchmark_results.json      # Lưu trữ dữ liệu thực nghiệm thô
+├── report/                         # Thư mục báo cáo (Typst)
+│   ├── report.pdf                  # File báo cáo PDF chính thức
+│   ├── report.typ                  # File nguồn Typst
+│   └── assets/                     # Thư mục chứa hình ảnh minh họa
 ├── config.py                       # Cấu hình hệ thống (EPSILON, Logger)
 ├── requirements.txt                # Danh sách thư viện dự án
 └── README.md                       # Hướng dẫn dự án
