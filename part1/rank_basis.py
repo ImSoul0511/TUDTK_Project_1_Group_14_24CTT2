@@ -21,15 +21,15 @@ def rank_and_basis(matrix_A):
     
     rows = len(matrix_A)
     cols = len(matrix_A[0])
-    # 1. Giữ lại bản sao của A gốc để tìm Không gian cột
+    # Giữ lại bản sao của A gốc để tìm Không gian cột
     A_original= [[val for val in row] for row in matrix_A]
 
-    # 2. Tạo ma trận M để khử Gauss-Jordan về RREF
+    # Tạo ma trận M để khử Gauss-Jordan về RREF
     M = [[val for val in row] for row in matrix_A]
     pivot_row = 0
     pivot_cols = []
 
-    # 3. Khử Gauss-Jordan về dạng RREF
+    # Khử Gauss-Jordan về dạng RREF
     for j in range(cols):
         if pivot_row >= rows:
             break
@@ -87,6 +87,7 @@ def verify_test_rank_and_basis(test_cases: list[dict]):
     warnings.simplefilter("ignore", UserWarning)
     
     # Hàm test này kiểm tra hạng, số chiều của không gian nghiệm và cơ sở không gian nghiệm
+    cfg.AutoTestReporter.print_header("KIỂM THỬ HẠNG VÀ CƠ SỞ")
     passed_count = 0
     total_count = len(test_cases)
 

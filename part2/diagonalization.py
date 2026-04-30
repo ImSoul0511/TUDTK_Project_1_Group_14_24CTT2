@@ -5,8 +5,9 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import part2.utils as ut
 import config as cfg 
-from part2.verification_part2 import verify_diagonalize_numpy 
-from part2.test_case_part2 import DIAGONALIZATION_TEST_CASES
+from config import AutoTestReporter
+from part2.verification import verify_diagonalize_numpy 
+from part2.test_case import DIAGONALIZATION_TEST_CASES
 from part1.gaussian import gaussian_eliminate
 
 # Dùng thuật toán Jacobi để tìm toàn bộ vector riêng 
@@ -70,7 +71,7 @@ def eigen_calculation_reverse_iteration(A, max_iterations=500, tol=1e-7):
     1. Dùng QR phân rã để tìm các Trị riêng xấp xỉ.
     2. Dùng Inverse Iteration (Lặp ngược) để tìm Vector riêng và làm mịn Trị riêng.
     """
-    from .decomposition import householder_qr_v1
+    from part2.decomposition import householder_qr_v1
     
     Ak = ut.copy_matrix(A)
     n = len(Ak)
@@ -173,7 +174,7 @@ def diagonalize(A):
     if any(len(row) != n for row in A):
         raise ValueError("Ma trận A phải là ma trận vuông để thực hiện chéo hóa.")
 
-    # 1. Tìm giá trị riêng và vector riêng
+    # Tìm giá trị riêng và vector riêng
     eigenvalues, P_cols = eigen_calculation_reverse_iteration(A)
 
     if len(P_cols) < n:
@@ -181,7 +182,7 @@ def diagonalize(A):
     
     P = [[P_cols[j][i] for j in range(n)] for i in range(n)]
     
-    # 2. Tạo ma trận đường chéo D
+    # Tạo ma trận đường chéo D
     D = [[0.0] * n for _ in range(n)]
     for i in range(n):
         D[i][i] = eigenvalues[i]
@@ -204,12 +205,7 @@ def run_diagonalize_tests(test_cases: list[dict]):
       - Sai số tái tạo A = P*D*P_inv
       - Sai số trị riêng so với numpy (max absolute error)
     """
-    SEP = "=" * 90
-    HDR = "-" * 90
-
-    print(f"\n{SEP}")
-    print(f"  KIỂM CHỨNG THUẬT TOÁN: Chéo hóa lặp QR (diagonalize_with_qr) — Tự cài đặt vs NumPy")
-    print(SEP)
+    AutoTestReporter.print_header("KIỂM CHỨNG THUẬT TOÁN: Chéo hóa (diagonalize) — Tự cài đặt vs NumPy")
 
     col_name    = 44
     col_rebuild = 20
@@ -223,7 +219,6 @@ def run_diagonalize_tests(test_cases: list[dict]):
         f"{'Kết quả':>{col_status}}"
     )
     print(header)
-    print(HDR)
 
     passed_count = 0
     total_count  = len(test_cases)
@@ -305,8 +300,7 @@ def run_diagonalize_tests(test_cases: list[dict]):
                 f"  -> Lỗi: {ex}"
             )
 
-    print(HDR)
-    cfg._print_summary_table(passed_count, total_count)
+    AutoTestReporter.print_summary(passed_count, total_count)
 
 if __name__ == "__main__":
     run_diagonalize_tests(DIAGONALIZATION_TEST_CASES)

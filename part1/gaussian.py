@@ -5,14 +5,12 @@ import config as cfg
 
 def back_substitution(U, c):
     """
-    Thực hiện phép thế ngược để giải hệ tam giác trên
-    
+    Giải hệ tam giác trên bằng phép thế ngược.
     Args:
-        U: Ma trận tam giác trên
-        c: Vector vế phải
-    
+        U: Ma trận tam giác trên.
+        c: Vector vế phải.
     Returns:
-        Vector nghiệm x
+        list: Vector nghiệm x.
     """
     n = len(U)
     x = [0.0] * n
@@ -25,14 +23,12 @@ def back_substitution(U, c):
 
 def gaussian_eliminate(A, b):
     """
-    Thực hiện phép biến đổi Gauss để đưa ma trận A về dạng tam giác trên
-    
+    Khử Gauss để đưa ma trận hệ số về dạng tam giác trên.
     Args:
-        A: Ma trận hệ số
-        b: Vector vế phải
-    
+        A: Ma trận hệ số.
+        b: Vector vế phải.
     Returns:
-        Ma trận sau khi khử, nghiệm x, số lần hoán đổi
+        tuple: Ma trận M, nghiệm x, số lần hoán đổi.
     """
     # Ghép ma trận A và vector b thành ma trận tăng cường M
     M = [row + [b[i]] for i, row in enumerate(A)]
@@ -68,10 +64,10 @@ def gaussian_eliminate(A, b):
                 M[i][j] -= l_ik * M[current_row][j]
         current_row += 1
 
-    rank = len(pivot_cols)  #Tính hạng của ma trận
+    rank = len(pivot_cols)  # Tính hạng của ma trận
 
-    #Hệ vô nghiệm
-    #Tồn tại dòng có vế trái bằng 0 nhưng vế phải khác 0
+    # Hệ vô nghiệm
+    # Tồn tại dòng có vế trái bằng 0 nhưng vế phải khác 0
     for i in range(rank, row):
         if not cfg.is_zero(M[i][col-1]):
             raise ValueError("Hệ phương trình vô nghiệm.")
@@ -81,7 +77,7 @@ def gaussian_eliminate(A, b):
     if rank < col - 1:
         free_cols = [j for j in range(col-1) if j not in pivot_cols]
 
-        # 1. Tìm nghiệm riêng x_p (Ngầm định các ẩn tự do = 0)
+        # Tìm nghiệm riêng x_p (Ngầm định các ẩn tự do = 0)
         x_p = [0.0] * (col-1)
         for i in range(rank - 1, -1, -1):
             p_col = pivot_cols[i]
@@ -91,7 +87,7 @@ def gaussian_eliminate(A, b):
             # x_chốt = (vế phải - tổng đã chuyển vế) / hệ số chốt
             x_p[p_col] = (M[i][col-1] - s_val) / M[i][p_col] 
 
-        # 2. Tìm cơ sở không gian nghiệm (Giải hệ thuần nhất Ax = 0, bật lần lượt ẩn tự do = 1)
+        # Tìm cơ sở không gian nghiệm (Giải hệ thuần nhất Ax = 0, bật lần lượt ẩn tự do = 1)
         null_basis = []
         for f in free_cols:
             v = [0.0] * (col-1)
@@ -106,7 +102,7 @@ def gaussian_eliminate(A, b):
                 v[p_col] = -s_val / M[i][p_col]
             null_basis.append(v)
 
-        # 3. Nghiệm tổng quát = Nghiệm riêng + các cơ sở không gian nghiệm (kèm tham số c)
+        # Nghiệm tổng quát = Nghiệm riêng + các cơ sở không gian nghiệm (kèm tham số c)
         formula = f"x = {[round(val, 4) for val in x_p]}"
         for idx, v in enumerate(null_basis):
             formula += f" + c{idx+1}*{[round(val, 4) for val in v]}"
@@ -114,8 +110,8 @@ def gaussian_eliminate(A, b):
         print(formula)
         return M, formula, s
     
-    #Hệ có nghiệm duy nhất
-    #rank = n (số ẩn)
+    # Hệ có nghiệm duy nhất
+    # rank = n (số ẩn)
     U = [row[:-1] for row in M[:rank]]
     c = [row[-1] for row in M[:rank]]
     x = back_substitution(U, c)
@@ -124,10 +120,18 @@ def gaussian_eliminate(A, b):
 
 
 def verify_test_back_substitution(test_cases: list[dict]):
+    """
+    Kiểm thử hàm thế ngược.
+    Args:
+        test_cases: Danh sách các bộ test.
+    Returns:
+        None
+    """
     import warnings
     warnings.simplefilter("ignore", UserWarning)
     passed_count = 0
     total_count = len(test_cases)
+    cfg.AutoTestReporter.print_header("KIỂM THỬ THẾ NGƯỢC")
 
     for case in test_cases:
         try:
@@ -160,10 +164,18 @@ def verify_test_back_substitution(test_cases: list[dict]):
     cfg.AutoTestReporter.print_summary(passed_count, total_count)
 
 def verify_test_gaussian_eliminate(test_cases: list[dict]):
+    """
+    Kiểm thử hàm khử Gauss.
+    Args:
+        test_cases: Danh sách các bộ test.
+    Returns:
+        None
+    """
     import warnings
     warnings.simplefilter("ignore", UserWarning)
     passed_count = 0
     total_count = len(test_cases)
+    cfg.AutoTestReporter.print_header("KIỂM THỬ KHỬ GAUSS")
 
     for case in test_cases:
         try:
