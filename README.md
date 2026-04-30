@@ -237,7 +237,7 @@ python part2/decomposition.py
 **2. Video Manim:**
 Link video:
 ```
-
+https://youtu.be/go4-iaTxMHc
 ```
 
 ### **Phần 3: Benchmark & Phân tích ổn định**
