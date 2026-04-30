@@ -126,7 +126,7 @@ Triển khai các phương pháp tìm trị riêng và giá trị kỳ dị.
 | `diagonalization.py` | `diagonalize` | Tìm toàn bộ trị riêng bằng phương pháp Jacobi (đối xứng) hoặc QR Iteration (tổng quát). |
 | `decomposition.py` | `svd(A)` | Toàn bộ tiến trình phân rã SVD (A = UΣVᵀ) từ trị riêng của $A^TA$. |
 | `verification_part2.py` | `verify_svd_numpy`, `verify_diagonalize_numpy` | Kiểm chứng kết quả thuật toán phân rã với NumPy. |
-| `test_case_part2.py` | `SVD_TEST_CASES` | Các bộ dữ liệu mẫu dùng để kiểm thử phần 2. |
+| `test_case_part2.py` | `SVD_TEST_CASES`, `DIAGONALIZATION_TEST_CASES` | Các bộ dữ liệu mẫu dùng để kiểm thử phần 2. |
 | `utils.py` | `matrix_multiply`, `vector_normalize`, v.v. | Thư viện hỗ trợ tính toán ma trận, tích vô hướng và trực giao hóa Gram-Schmidt. |
 | `manim_scene_1.py` | `Scene` | Cảnh 1: Giải phẫu sự hỗn loạn (Anatomy of Chaos). |
 | `manim_scene_2.py` | `Scene2`, `Scene2_3D` | Cảnh 2: Trực quan hóa hình học 2D/3D & ma trận Sigma. |
