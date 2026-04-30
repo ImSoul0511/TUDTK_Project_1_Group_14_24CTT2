@@ -2,9 +2,8 @@ import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np
-import utils as ut
-import config as cfg 
-from test_case_part2 import SVD_TEST_CASES 
+import part2.utils as ut
+from part2.test_case import SVD_TEST_CASES 
 
 def verify_svd_numpy(A):
     """
@@ -14,14 +13,14 @@ def verify_svd_numpy(A):
         3. Trực giao Vt : Vt * Vt^T ≈ I
 
     Args:
-        A: Ma trận đầu vào (list of lists, m × n)
+        A: Ma trận đầu vào (list of lists, m x n)
 
     Returns:
-        ok          : bool  – True nếu cả 3 điều kiện đều thỏa
-        rebuild_err : float – Sai số Frobenius của bước tái tạo
-        u_orth_err  : float – Sai số Frobenius kiểm tra trực giao U
-        v_orth_err  : float – Sai số Frobenius kiểm tra trực giao Vt
-        sigmas      : list  – Danh sách các giá trị kỳ dị
+        ok          : bool  - True nếu cả 3 điều kiện đều thỏa
+        rebuild_err : float - Sai số Frobenius của bước tái tạo
+        u_orth_err  : float - Sai số Frobenius kiểm tra trực giao U
+        v_orth_err  : float - Sai số Frobenius kiểm tra trực giao Vt
+        sigmas      : list  - Danh sách các giá trị kỳ dị
     """
     from part2.decomposition import svd
     m = len(A)
@@ -64,13 +63,13 @@ def verify_diagonalize_numpy(A):
         2. Trị riêng : D[i][i] khớp với np.linalg.eig (theo tập hợp)
 
     Args:
-        A: Ma trận vuông (list of lists, n × n)
+        A: Ma trận vuông (list of lists, n x n)
 
     Returns:
-        ok           : bool  – True nếu cả 2 điều kiện đều thỏa
-        rebuild_err  : float – Sai số Frobenius của bước tái tạo A
-        max_eig_err  : float – Sai số tuyệt đối lớn nhất của trị riêng với numpy
-        eigenvalues  : list  – Danh sách trị riêng (thực) từ đường chéo D
+        ok           : bool  - True nếu cả 2 điều kiện đều thỏa
+        rebuild_err  : float - Sai số Frobenius của bước tái tạo A
+        max_eig_err  : float - Sai số tuyệt đối lớn nhất của trị riêng với numpy
+        eigenvalues  : list  - Danh sách trị riêng (thực) từ đường chéo D
     """
     from part2.diagonalization import diagonalize
     n = len(A)

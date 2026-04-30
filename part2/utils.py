@@ -68,11 +68,11 @@ def find_orthogonal_u(existing_vectors, dim):
     """
     # Thử lần lượt các vector đơn vị chuẩn: [1, 0, 0...], [0, 1, 0...]
     for i in range(dim):
-        # 1. Tạo vector đơn vị chuẩn e_i
+        # Tạo vector đơn vị chuẩn e_i
         v = [0.0] * dim
         v[i] = 1.0
         
-        # 2. Quá trình Gram-Schmidt
+        # Quá trình Gram-Schmidt
         v_projected = v[:]
         for u in existing_vectors:
             # Tính hệ số chiếu: (v . u) / (u . u)
@@ -80,7 +80,7 @@ def find_orthogonal_u(existing_vectors, dim):
             projection_scalar = dot_product(v, u)
             v_projected = subtract_vectors(v_projected, u, projection_scalar)
             
-        # 3. Kiểm tra độ dài vector còn lại
+        # Kiểm tra độ dài vector còn lại
         mag = vector_norm(v_projected)
         if mag > 1e-10: 
             # Chuẩn hóa để trả về vector đơn vị
@@ -202,7 +202,7 @@ def _mat_multiply_np(A, B):
     return np.dot(np.array(A, dtype=float), np.array(B, dtype=float)).tolist()
 
 def _identity_np(n):
-    """Trả về ma trận đơn vị n×n dạng list of lists."""
+    """Trả về ma trận đơn vị nxn dạng list of lists."""
     return np.eye(n).tolist()
 
 def _sort_eigenvalues(vals):

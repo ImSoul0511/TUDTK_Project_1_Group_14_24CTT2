@@ -1,6 +1,6 @@
 from IPython.display import display, Markdown
 
-EPSILON = 1e-12
+EPSILON = 1e-15
 
 def is_zero(x):
     return abs(x) < EPSILON
@@ -12,6 +12,16 @@ class AutoTestReporter:
     """
     Lớp tiện ích (Utility Class) hỗ trợ in kết quả kiểm thử (Test Results) ra Terminal.
     """
+    minus_sign = "-" * 90
+
+    @classmethod
+    def print_header(cls, title: str):
+        """
+        In tiêu đề của phần kiểm thử.
+        """
+        print(cls.minus_sign)
+        print(title)
+        print(cls.minus_sign)
 
     @classmethod
     def print_result(cls, test_name: str, passed: bool, details: str = ""):
@@ -41,25 +51,17 @@ class AutoTestReporter:
         In ra dòng tổng kết: Số test thành công / Tổng số test, tỷ lệ % và nhận xét.
         """
         if total_count == 0:
-            display(Markdown("### All failed\n"))
+            print(cls.minus_sign)
+            print("All failed")
+            print(cls.minus_sign)
             return
         percent = (passed_count / total_count) * 100
         
         if passed_count == total_count:
-            display(Markdown(f"### Kết luận: {passed_count}/{total_count} ({percent:.0f}%) hoàn thành\n"))
+            print(cls.minus_sign)
+            print(f"Kết luận: {passed_count}/{total_count} ({percent:.0f}%) hoàn thành")
+            print(cls.minus_sign)
         else:
-            display(Markdown(f"### Kết luận: Chỉ {passed_count}/{total_count} ({percent:.1f}%) đã hoàn thành\n"))
-
-def _print_summary_table(passed: int, total: int):
-    """In dòng tổng kết theo format nhất quán với part1."""
-    if total == 0:
-        print("  [!] Không có test case nào.\n")
-        return
-    percent = passed / total * 100
-    if passed == total:
-        verdict = "TẤT CẢ ĐẠT"
-    elif passed >= total * 0.8:
-        verdict = "ĐẠT (còn lỗi nhỏ)"
-    else:
-        verdict = "CẦN KIỂM TRA LẠI"
-    print(f"\n  Kết luận: {passed}/{total} test ({percent:.0f}%)  —  {verdict}\n")
+            print(cls.minus_sign)
+            print(f"Kết luận: Chỉ {passed_count}/{total_count} ({percent:.1f}%) đã hoàn thành")
+            print(cls.minus_sign)

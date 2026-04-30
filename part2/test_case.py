@@ -6,7 +6,7 @@ def get_expected_sigmas(A):
     _, s, _ = np.linalg.svd(A)
     return s.tolist()
 # ----------------------------------------------------------------------------
-# 1. TEST CASES: PHÂN RÃ SVD (Singular Value Decomposition)
+# TEST CASES: PHÂN RÃ SVD (Singular Value Decomposition)
 # ----------------------------------------------------------------------------
 # Chiến lược kiểm chứng:
 #   - Tái tạo: A ≈ U * Σ * Vt  (sai số tối đa EPSILON)
@@ -137,7 +137,7 @@ SVD_TEST_CASES = [
 
 
 # ----------------------------------------------------------------------------
-# 2. TEST CASES: CHÉO HÓA BẰNG PHƯƠNG PHÁP LẶP QR (diagonalize_with_qr)
+# TEST CASES: CHÉO HÓA BẰNG PHƯƠNG PHÁP LẶP QR (diagonalize_with_qr)
 # ----------------------------------------------------------------------------
 # Chiến lược kiểm chứng:
 #   - Tái tạo: A ≈ P * D * P_inv  (sai số tối đa EPSILON)

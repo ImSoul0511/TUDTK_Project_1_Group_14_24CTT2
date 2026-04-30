@@ -6,28 +6,25 @@ from verification import verify_inverse_numpy as verify_inverse
 
 def inverse(matrix_A):
     """
-    Tính ma trận nghịch đảo A^-1 bằng phương pháp Gauss-Jordan có Partial Pivoting.
-
+    Tìm ma trận nghịch đảo bằng khử Gauss-Jordan.
     Args:
-        matrix_A: Ma trận hệ số
-    
+        matrix_A: Ma trận vuông.
     Returns:
-        Ma trận nghịch đảo
-
+        list: Ma trận nghịch đảo hoặc None nếu không tồn tại.
     """
     n = len(matrix_A)
-    # 1. Kiểm tra ma trận có vuông không
+    # Kiểm tra ma trận có vuông không
     for row in matrix_A:
         if len(row) != n:
             raise ValueError("Ma trận không vuông, không thể tìm nghịch đảo.")
-    # 2. Tạo ma trận  M = [A | I]
+    # Tạo ma trận  M = [A | I]
     M = []
     for i in range(n):
         row_A = [element for element in matrix_A[i]]
         row_I=[1.0 if i==j else 0.0 for j in range(n) ]
         M.append(row_A + row_I)
 
-    # 3. Quá trình khử Gauss-Jordan
+    # Quá trình khử Gauss-Jordan
     for k in range(n):
         #a. Tìm dòng p có phần tử chốt lớn nhất từ dòng k trở xuống
         p = k
@@ -50,7 +47,7 @@ def inverse(matrix_A):
                 factor = M[i][k]
                 for j in range(k, 2 * n):
                     M[i][j]=M[i][j]-factor*M[k][j]
-    #4. Ma trận nghịch đảo
+    # Ma trận nghịch đảo
     inverse_matrix = []
     for i in range(n):
         inverse_matrix.append(M[i][n:])
@@ -58,11 +55,18 @@ def inverse(matrix_A):
 
 
 def verify_test_inverse(test_cases: list[dict]):
+    """
+    Kiểm thử hàm tìm ma trận nghịch đảo.
+    Args:
+        test_cases: Danh sách các bộ test.
+    Returns:
+        None
+    """
     import warnings
     warnings.simplefilter("ignore", UserWarning)
     passed_count = 0
     total_count = len(test_cases)
-
+    cfg.AutoTestReporter.print_header("KIỂM THỬ MA TRẬN NGHỊCH ĐẢO")
     for case in test_cases:
         try:
             inv_A = inverse(case["Ma trận A"])

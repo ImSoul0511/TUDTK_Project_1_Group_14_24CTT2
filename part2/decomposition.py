@@ -4,9 +4,10 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import config as cfg
 import part2.utils as ut
+from config import AutoTestReporter
 from part2.diagonalization import eigen_calculation_with_jacobi
-from part2.test_case_part2 import SVD_TEST_CASES
-from part2.verification_part2 import verify_svd_numpy
+from part2.test_case import SVD_TEST_CASES
+from part2.verification import verify_svd_numpy
 
 def svd(A):
     """
@@ -16,8 +17,8 @@ def svd(A):
     Thuật toán:
     1. Tính ma trận đối xứng ATA = A^T * A.
     2. Tìm các giá trị riêng (lambdas) và vector riêng (V) của ATA bằng phương pháp Jacobi.
-    3. Tính các giá trị kỳ dị (sigmas): σ_i = √λ_i.
-    4. Tính ma trận U dựa trên công thức: u_i = (1/σ_i) * A * v_i.
+    3. Tính các giá trị kỳ dị (sigmas): sigma_i = √lambda_i.
+    4. Tính ma trận U dựa trên công thức: u_i = (1/sigma_i) * A * v_i.
     
     Công thức chính:
        - A = U * Σ * V^T
@@ -30,7 +31,7 @@ def svd(A):
 
     Returns:
         U: Ma trận trực giao (m x k).
-        sigmas: Danh sách các giá trị kỳ dị σ sắp xếp giảm dần.
+        sigmas: Danh sách các giá trị kỳ dị sigma sắp xếp giảm dần.
         Vt: Ma trận V đã được chuyển vị (k x n).
     """
     # Bước 1: Tính ATA để tìm các giá trị riêng cho V
@@ -85,7 +86,7 @@ def householder_qr_v1(A):
         Tại mỗi bước j, xây dựng ma trận phản xạ Householder H_j để triệt tiêu
         các phần tử bên dưới đường chéo trong cột j của ma trận R.
         
-    Công thức chính (từ lec16):
+    Công thức chính:
         1. Trích cột:       x = R(j:m, j)
         2. Chuẩn:           normx = ||x||₂
         3. Chọn dấu:        s = -sign(x₁)     (tránh triệt tiêu catastrophic)
@@ -178,12 +179,7 @@ def run_svd_tests(test_cases: list[dict]):
       - Sai số tái tạo, sai số trực giao U, sai số trực giao Vt
       - (Nếu có expected_sigmas) Sai số so với numpy
     """
-    SEP = "=" * 95
-    HDR = "-" * 95
-
-    print(f"\n{SEP}")
-    print(f"  KIỂM CHỨNG THUẬT TOÁN: SVD (Singular Value Decomposition) — Tự cài đặt vs NumPy")
-    print(SEP)
+    AutoTestReporter.print_header("KIỂM CHỨNG THUẬT TOÁN: SVD (Singular Value Decomposition) — Tự cài đặt vs NumPy")
 
     col_name    = 38
     col_rebuild = 16
@@ -199,7 +195,6 @@ def run_svd_tests(test_cases: list[dict]):
         f"{'Kết quả':>{col_status}}"
     )
     print(header)
-    print(HDR)
 
     passed_count = 0
     total_count  = len(test_cases)
@@ -265,8 +260,7 @@ def run_svd_tests(test_cases: list[dict]):
                 f"  -> Lỗi: {ex}"
             )
 
-    print(HDR)
-    cfg._print_summary_table(passed_count, total_count)
+    AutoTestReporter.print_summary(passed_count, total_count)
 
 if __name__ == "__main__":
     run_svd_tests(SVD_TEST_CASES)
