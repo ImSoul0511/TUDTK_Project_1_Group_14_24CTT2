@@ -1,5 +1,9 @@
 import math
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import config
+import numpy as np
 
 def matrix_transpose(A):
     """ Chuyển vị ma trận """
@@ -64,11 +68,11 @@ def find_orthogonal_u(existing_vectors, dim):
     """
     # Thử lần lượt các vector đơn vị chuẩn: [1, 0, 0...], [0, 1, 0...]
     for i in range(dim):
-        # 1. Tạo vector đơn vị chuẩn e_i
+        # Tạo vector đơn vị chuẩn e_i
         v = [0.0] * dim
         v[i] = 1.0
         
-        # 2. Quá trình Gram-Schmidt
+        # Quá trình Gram-Schmidt
         v_projected = v[:]
         for u in existing_vectors:
             # Tính hệ số chiếu: (v . u) / (u . u)
@@ -76,7 +80,7 @@ def find_orthogonal_u(existing_vectors, dim):
             projection_scalar = dot_product(v, u)
             v_projected = subtract_vectors(v_projected, u, projection_scalar)
             
-        # 3. Kiểm tra độ dài vector còn lại
+        # Kiểm tra độ dài vector còn lại
         mag = vector_norm(v_projected)
         if mag > 1e-10: 
             # Chuẩn hóa để trả về vector đơn vị
@@ -172,3 +176,35 @@ def orthogonal_matrix(eigenvectors):
     for v in eigenvectors:
         Q.append(vector_normalize(v))
     return Q 
+    
+def matrix_sub_lambda_I(A, lam):
+    """Tính ma trận (A - λI)"""
+    n = len(A)
+    res = copy_matrix(A)
+    for i in range(n):
+        res[i][i] -= lam
+    return res
+
+def _mat_max_abs_diff(A, B):
+    """Tính sai số tuyệt đối lớn nhất giữa 2 ma trận (list of lists)."""
+    A_np = np.array(A, dtype=float)
+    B_np = np.array(B, dtype=float)
+    return float(np.max(np.abs(A_np - B_np)))
+
+def _frobenius_error(A, B):
+    """Tính chuẩn Frobenius của hiệu |A - B|_F."""
+    A_np = np.array(A, dtype=float)
+    B_np = np.array(B, dtype=float)
+    return float(np.linalg.norm(A_np - B_np, 'fro'))
+
+def _mat_multiply_np(A, B):
+    """Nhân 2 ma trận (list of lists) → list of lists dùng numpy."""
+    return np.dot(np.array(A, dtype=float), np.array(B, dtype=float)).tolist()
+
+def _identity_np(n):
+    """Trả về ma trận đơn vị nxn dạng list of lists."""
+    return np.eye(n).tolist()
+
+def _sort_eigenvalues(vals):
+    """Sắp xếp danh sách trị riêng thực theo thứ tự giảm dần để so sánh."""
+    return sorted([float(v) for v in vals], reverse=True)

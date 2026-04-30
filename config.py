@@ -12,6 +12,16 @@ class AutoTestReporter:
     """
     Lớp tiện ích (Utility Class) hỗ trợ in kết quả kiểm thử (Test Results) ra Terminal.
     """
+    minus_sign = "-" * 90
+
+    @classmethod
+    def print_header(cls, title: str):
+        """
+        In tiêu đề của phần kiểm thử.
+        """
+        print(cls.minus_sign)
+        print(title)
+        print(cls.minus_sign)
 
     @classmethod
     def print_result(cls, test_name: str, passed: bool, details: str = ""):
@@ -41,15 +51,17 @@ class AutoTestReporter:
         In ra dòng tổng kết: Số test thành công / Tổng số test, tỷ lệ % và nhận xét.
         """
         if total_count == 0:
-            display(Markdown("### All failed\n"))
+            print(cls.minus_sign)
+            print("All failed")
+            print(cls.minus_sign)
             return
         percent = (passed_count / total_count) * 100
         
         if passed_count == total_count:
-            display(Markdown(f"### Kết luận: {passed_count}/{total_count} ({percent:.0f}%) hoàn thành\n"))
+            print(cls.minus_sign)
+            print(f"Kết luận: {passed_count}/{total_count} ({percent:.0f}%) hoàn thành")
+            print(cls.minus_sign)
         else:
-            display(Markdown(f"### Kết luận: Chỉ {passed_count}/{total_count} ({percent:.1f}%) đã hoàn thành\n"))
-
-
-def calculate_l2_relative_error(A: list[list[float]], x_hat: list[float], b: list[float]) -> float:
-    """Tính sai số tương đối chuẩn L2 bằng NumPy"""
+            print(cls.minus_sign)
+            print(f"Kết luận: Chỉ {passed_count}/{total_count} ({percent:.1f}%) đã hoàn thành")
+            print(cls.minus_sign)

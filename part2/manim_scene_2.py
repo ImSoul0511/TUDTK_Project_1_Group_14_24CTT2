@@ -1,42 +1,14 @@
 from manim import *
 import numpy as np
 
-"""
-Flow: 
-    1. Intro 3 ô vuông S, V, D
-    2. Giới thiệu công thức SVD
-    3. Ma trận Sigma
-    4. Ma trận đơn vị có nhiệm vụ giữ nguyên không gian
-    5. Mở rộng ma trận đơn vị sang ma trận hình chữ nhật (vẫn giữ nguyên không gian)
-        - Ví dụ ma trận 2x3 sẽ biến không gian 3D thành 2D bằng cách bỏ đi chiều Z 
-        (Hiệu ứng ma trận đơn vị 2x3 tác động lên không gian 3D)
-        - Ma trận 3x2 sẽ biến không gian 2D thành 3D bằng cách thêm chiều Z
-        (Hiệu ứng ma trận đơn vị 3x2 tác động lên không gian 2D)
-    => Gọi là ma trận hiệu chỉnh chiều
-    6. Ma trận đường chéo có nhiệm vụ kéo giãn hoặc thu hẹp không gian theo các chiều x, y, z tương ứng trên đường chéo
-    => Focus hiệu ứng của ma trận [[2,0], [0,3]] kéo dãn trục Ox 2 lần và trục Oy 3 lần 
-    7. Khi kết hợp 2 ma trận hiệu chỉnh chiều và ma trận đường chéo
-    => Ta được hiệu ứng thêm hoặc mất chiều đồng thời kéo giãn / thu hẹp không gian
-    => Đây là nhiệm vụ của ma trận Sigma
-
-Render order:
-    manim -pql part2/manim_scene_2.py Scene2
-    manim -pql part2/manim_scene_2.py Scene2_3D
-    manim -pql part2/manim_scene_2.py Scene2_Sigma
-"""
-
-
-# ==============================================================================
-# SCENE 2: Steps 1-4 (Intro, SVD Formula, Sigma, Identity Matrix)
-# ==============================================================================
-class Scene2(MovingCameraScene):
+class Scene_3(MovingCameraScene):
+    """
+    Trực quan hóa tính chất của ma trận đường chéo
+    """
     def construct(self):
         self.camera.frame.shift(DOWN * 1.0)
         center_y = -1.0
 
-        # ------------------------------------------
-        # STEP 1: INTRO – 3 ô vuông S – V – D
-        # ------------------------------------------
         letters = ["S", "V", "D"]
         boxes = VGroup()
         for letter in letters:
@@ -55,7 +27,6 @@ class Scene2(MovingCameraScene):
         )
         self.wait(1)
 
-        # Flash viền sáng
         self.play(
             LaggedStart(
                 *[Indicate(b[0], color=GOLD, scale_factor=1.05) for b in boxes],
@@ -67,9 +38,6 @@ class Scene2(MovingCameraScene):
         self.play(FadeOut(boxes))
         self.wait(0.5)
 
-        # ------------------------------------------
-        # STEP 2: GIỚI THIỆU CÔNG THỨC SVD
-        # ------------------------------------------
         svd_title = Text("Phân rã Giá trị Kỳ dị (SVD)", color=GOLD, font_size=40)
         svd_title.move_to(np.array([0, center_y + 2.5, 0]))
 
@@ -116,15 +84,11 @@ class Scene2(MovingCameraScene):
         )
         self.wait(3)
 
-        # ------------------------------------------
-        # STEP 3: FOCUS VÀO MA TRẬN SIGMA
-        # ------------------------------------------
         self.play(
             FadeOut(svd_title, desc_U, desc_V, arrow_U, arrow_V, arrow_Sigma),
             FadeOut(svd_eq[0], svd_eq[1], svd_eq[2], svd_eq[4])
         )
 
-        # Di chuyển Σ và mô tả lên góc trên-trái làm header
         self.play(
             svd_eq[3].animate.scale(0.7).move_to(np.array([-5.5, center_y + 3, 0])),
             desc_Sigma.animate.scale(1.1).move_to(np.array([-2.5, center_y + 3, 0])),
@@ -153,10 +117,6 @@ class Scene2(MovingCameraScene):
         self.play(FadeOut(svd_eq[3], desc_Sigma, sigma_explain, tasks, transition_txt))
         self.wait(0.5)
 
-        # ------------------------------------------
-        # STEP 4: MA TRẬN ĐƠN VỊ GIỮ NGUYÊN KHÔNG GIAN (2D Demo)
-        # ------------------------------------------
-        # --- Khung + Masks (style giống Scene1) ---
         frame_box = Rectangle(width=13, height=4.5, color=WHITE, stroke_width=2).move_to(ORIGIN)
         frame_box.set_z_index(11)
 
@@ -169,7 +129,6 @@ class Scene2(MovingCameraScene):
         title_step4 = Text("Ma trận Đơn vị I — Giữ nguyên không gian", font_size=26, color=GOLD)
         title_step4.next_to(frame_box, UP, buff=0.15).set_z_index(12)
 
-        # --- Vùng hình học ---
         plane = NumberPlane(
             x_range=[-8, 8], y_range=[-8, 8],
             background_line_style={"stroke_opacity": 0.4}
@@ -179,7 +138,6 @@ class Scene2(MovingCameraScene):
         basis_e2 = Vector(UP, color=RED)
         geometry = VGroup(plane, unit_circle, basis_e1, basis_e2)
 
-        # --- Ma trận I bên dưới khung ---
         math_I = MathTex(
             "I", "=",
             r"\begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}",
@@ -191,7 +149,6 @@ class Scene2(MovingCameraScene):
         self.play(FadeIn(math_I))
         self.wait(1)
 
-        # Áp dụng I — không gian giữ nguyên
         I_matrix = np.array([[1, 0], [0, 1]])
 
         label_apply = Text("Áp dụng I lên không gian:", font_size=22, color=GREEN)
@@ -206,7 +163,6 @@ class Scene2(MovingCameraScene):
         self.play(Write(result_txt))
         self.wait(2)
 
-        # Gợi mở cho step 5
         hint_txt = Text("Nếu I không vuông thì sao? → Hiệu chỉnh chiều!", font_size=22, color=TEAL)
         hint_txt.next_to(math_I, DOWN, buff=0.5).set_z_index(12)
         self.play(FadeOut(box_I), Write(hint_txt))
@@ -217,13 +173,11 @@ class Scene2(MovingCameraScene):
         self.wait(1)
 
 
-# ==============================================================================
-# SCENE 2_3D: Step 5 (Ma trận hiệu chỉnh chiều — 3D demos)
-# ==============================================================================
-class Scene2_3D(ThreeDScene):
+class Scene_4(ThreeDScene):
+    """
+    Trực quan hóa không gian 3D bị suy biến
+    """
     def construct(self):
-        # --- Khung + Masks ---
-        # frame_box ở ORIGIN để khớp với camera 3D (luôn nhìn vào ORIGIN)
         self.move_camera(frame_center=np.array([0, -0.75, 0]))
         frame_box = Rectangle(width=12, height=5, color=WHITE, stroke_width=2).move_to(ORIGIN)
         frame_box.set_z_index(20)
@@ -242,16 +196,11 @@ class Scene2_3D(ThreeDScene):
 
         self.play(FadeIn(frame_box, masks), Write(title))
 
-        # --- Trục 3D (dùng chung cho 5a và 5b) ---
-        # Axes ở ORIGIN — camera 3D mặc định nhìn vào đây
         axes = ThreeDAxes(
             x_range=[-3, 3], y_range=[-3, 3], z_range=[-3, 3],
             axis_config={"stroke_width": 2}
         )
 
-        # ==========================================
-        # STEP 5a: I_{2×3} — Không gian 3D → 2D (Bỏ chiều Z)
-        # ==========================================
         subtitle_5a = Text("I₂ₓ₃ : Không gian 3D → 2D (Bỏ chiều Z)", font_size=20, color=TEAL)
         subtitle_5a.next_to(frame_box, DOWN, buff=0.25).set_z_index(25)
         self.add_fixed_in_frame_mobjects(subtitle_5a)
@@ -267,7 +216,6 @@ class Scene2_3D(ThreeDScene):
         self.add_fixed_in_frame_mobjects(math_5a)
         self.remove(math_5a)
 
-        # Hình cầu 3D — ở ORIGIN (trùng tâm camera 3D → hiện giữa frame_box)
         sphere = Sphere(radius=1.2, resolution=(24, 24))
         sphere.set_fill(BLUE_B, opacity=0.5)
         sphere.set_stroke(BLUE_A, width=0.5, opacity=0.8)
@@ -279,7 +227,6 @@ class Scene2_3D(ThreeDScene):
         self.play(FadeIn(subtitle_5a, shift=UP), FadeIn(math_5a, shift=UP))
         self.wait(1)
 
-        # Highlight ma trận và áp dụng: [[1,0,0],[0,1,0],[0,0,0]] — ép Z = 0
         box_5a = SurroundingRectangle(math_5a[2], color=TEAL, buff=0.1).set_z_index(25)
         self.add_fixed_in_frame_mobjects(box_5a)
         self.remove(box_5a)
@@ -291,7 +238,6 @@ class Scene2_3D(ThreeDScene):
         self.play(ApplyMatrix(crush_z, sphere), run_time=3)
         self.wait(1)
 
-        # Trả camera phẳng để thấy kết quả 2D
         self.move_camera(phi=10 * DEGREES, theta=-90 * DEGREES, run_time=2)
 
         result_5a = Text("→ Hình cầu 3D bị ép phẳng thành hình tròn 2D!", font_size=18, color=GREEN)
@@ -301,13 +247,9 @@ class Scene2_3D(ThreeDScene):
         self.play(FadeIn(result_5a))
         self.wait(2)
 
-        # Dọn dẹp 5a
         self.play(FadeOut(sphere, subtitle_5a, math_5a, box_5a, result_5a))
         self.wait(0.5)
 
-        # ==========================================
-        # STEP 5b: I_{3×2} — Không gian 2D → 3D (Thêm chiều Z = 0)
-        # ==========================================
         subtitle_5b = Text("I₃ₓ₂ : Không gian 2D → 3D (Thêm chiều Z = 0)", font_size=20, color=MAROON_B)
         subtitle_5b.next_to(frame_box, DOWN, buff=0.25).set_z_index(25)
         self.add_fixed_in_frame_mobjects(subtitle_5b)
@@ -322,7 +264,6 @@ class Scene2_3D(ThreeDScene):
         self.add_fixed_in_frame_mobjects(math_5b)
         self.remove(math_5b)
 
-        # Bắt đầu từ nhìn thẳng (2D) — hình tròn phẳng
         self.move_camera(phi=0, theta=-90 * DEGREES, run_time=1)
 
         flat_circle = Circle(radius=1.2, color=YELLOW, fill_opacity=0.3)
@@ -333,12 +274,10 @@ class Scene2_3D(ThreeDScene):
         self.play(FadeIn(subtitle_5b), FadeIn(math_5b))
         self.wait(1)
 
-        # Highlight ma trận
         box_5b = SurroundingRectangle(math_5b[2], color=MAROON_B, buff=0.04).set_z_index(25)
         self.add_fixed_in_frame_mobjects(box_5b)
         self.remove(box_5b)
         self.play(Create(box_5b))
-        # "Nhúng" vào 3D bằng cách xoay camera → lộ trục Z
         embed_label = Text("→ Hình tròn 2D được nhúng vào không gian 3D (z = 0)", font_size=18, color=GREEN)
         embed_label.next_to(frame_box, DOWN, buff=0.15).set_z_index(25)
         self.add_fixed_in_frame_mobjects(embed_label)
@@ -350,12 +289,10 @@ class Scene2_3D(ThreeDScene):
         self.play(FadeIn(embed_label))
         self.wait(2)
 
-        # Dọn dẹp 5b
         self.play(FadeOut(embed_label))
         self.play(FadeOut(axes, flat_circle))
         self.move_camera(phi=0, theta=-90 * DEGREES, run_time=1)
 
-        # --- Kết luận Step 5 ---
         conclude = Text("→ Đây được gọi là Ma trận Hiệu chỉnh chiều", font_size=28, color=GOLD)
         conclude.set_z_index(25)
         self.add_fixed_in_frame_mobjects(conclude)
@@ -364,17 +301,14 @@ class Scene2_3D(ThreeDScene):
         self.play(FadeOut(conclude, frame_box, masks, title))
 
 
-# ==============================================================================
-# SCENE 2_SIGMA: Steps 6-7 (Diagonal Matrix + Kết hợp → Sigma)
-# ==============================================================================
-class Scene2_Sigma(MovingCameraScene):
+class Scene_5(MovingCameraScene):
+    """
+    Ma trận Sigma trong phân rã SVD
+    """
     def construct(self):
         self.camera.frame.shift(np.array([0, -0.5, 0]))
         center_y = -1.5
 
-        # ------------------------------------------
-        # STEP 6: MA TRẬN ĐƯỜNG CHÉO KÉO GIÃN (2D Demo)
-        # ------------------------------------------
         frame_box = Rectangle(width=13, height=4.5, color=WHITE, stroke_width=2).move_to(ORIGIN)
         frame_box.set_z_index(11)
 
@@ -387,7 +321,6 @@ class Scene2_Sigma(MovingCameraScene):
         title_diag = Text("Ma trận Đường chéo — Kéo giãn theo trục", font_size=26, color=GOLD)
         title_diag.next_to(frame_box, UP, buff=0.15).set_z_index(12)
 
-        # --- Vùng hình học (thu nhỏ 0.5x để sau khi giãn [[2,0],[0,3]] vẫn nằm trong khung) ---
         plane = NumberPlane(
             x_range=[-8, 8], y_range=[-8, 8],
             background_line_style={"stroke_opacity": 0.4}
@@ -398,7 +331,6 @@ class Scene2_Sigma(MovingCameraScene):
         geometry = VGroup(plane, unit_circle, basis_e1, basis_e2)
         geometry.scale(0.5)
 
-        # --- Ma trận D bên dưới khung ---
         math_D = MathTex(
             "D", "=",
             r"\begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}",
@@ -411,7 +343,6 @@ class Scene2_Sigma(MovingCameraScene):
         self.play(FadeIn(math_D))
         self.wait(1)
 
-        # Áp dụng D = [[2,0],[0,3]]
         D_matrix = np.array([[2, 0], [0, 3]])
 
         label_D = Text("Ox × 2,  Oy × 3", font_size=22, color=ORANGE)
@@ -427,19 +358,14 @@ class Scene2_Sigma(MovingCameraScene):
         self.play(Write(result_D))
         self.wait(2)
 
-        # Dọn dẹp step 6
         self.play(FadeOut(geometry, frame_box, masks, title_diag, math_D,
                           label_D, box_D, result_D))
         self.wait(0.5)
 
-        # ------------------------------------------
-        # STEP 7: KẾT HỢP → MA TRẬN SIGMA
-        # ------------------------------------------
         title_sigma = Text("Kết hợp: Σ = Đường chéo × Hiệu chỉnh chiều", font_size=30, color=GOLD)
         title_sigma.move_to(np.array([0, center_y + 2.8, 0]))
         self.play(Write(title_sigma))
 
-        # Phần derivation: tách từng thành phần để highlight
         sigma_eq = MathTex(r"\Sigma", "=", font_size=48)
         sigma_eq[0].set_color(YELLOW)
         mat_diag = MathTex(
@@ -457,7 +383,6 @@ class Scene2_Sigma(MovingCameraScene):
         self.play(FadeIn(derivation))
         self.wait(1)
 
-        # Highlight từng thành phần (label căn giữa dưới ma trận tương ứng)
         box_diag = SurroundingRectangle(mat_diag, color=ORANGE, buff=0.05)
         label_diag = Text("Kéo giãn", font_size=18, color=ORANGE)
         label_diag.next_to(mat_diag, DOWN, buff=0.4)
@@ -473,7 +398,6 @@ class Scene2_Sigma(MovingCameraScene):
 
         self.play(FadeOut(box_diag, label_diag, box_dim, label_dim))
 
-        # Biến đổi nhân ma trận → kết quả
         sigma_result = MathTex(
             r"\Sigma", "=",
             r"\begin{bmatrix} 2 & 0 & 0 \\ 0 & 3 & 0 \end{bmatrix}",
@@ -484,7 +408,6 @@ class Scene2_Sigma(MovingCameraScene):
         self.play(Transform(derivation, sigma_result), run_time=2)
         self.wait(1)
 
-        # Kết luận
         final_note1 = Text(
             "Σ vừa khử chiều (3D → 2D), vừa kéo giãn (Ox × 2, Oy × 3)",
             font_size=24, color=GREEN

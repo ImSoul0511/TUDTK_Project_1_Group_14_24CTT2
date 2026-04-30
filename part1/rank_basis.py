@@ -1,5 +1,7 @@
-import config
-from config import AutoTestReporter
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import config as cfg
 
 def rank_and_basis(matrix_A):
     """
@@ -19,15 +21,15 @@ def rank_and_basis(matrix_A):
     
     rows = len(matrix_A)
     cols = len(matrix_A[0])
-    # 1. Giữ lại bản sao của A gốc để tìm Không gian cột
+    # Giữ lại bản sao của A gốc để tìm Không gian cột
     A_original= [[val for val in row] for row in matrix_A]
 
-    # 2. Tạo ma trận M để khử Gauss-Jordan về RREF
+    # Tạo ma trận M để khử Gauss-Jordan về RREF
     M = [[val for val in row] for row in matrix_A]
     pivot_row = 0
     pivot_cols = []
 
-    # 3. Khử Gauss-Jordan về dạng RREF
+    # Khử Gauss-Jordan về dạng RREF
     for j in range(cols):
         if pivot_row >= rows:
             break
@@ -37,7 +39,7 @@ def rank_and_basis(matrix_A):
             if abs(M[i][j]) > abs(M[max_row][j]):
                 max_row = i
 
-        if config.is_zero(M[max_row][j]):
+        if cfg.is_zero(M[max_row][j]):
             # Không có pivot tại cột j
             continue
 
@@ -85,6 +87,7 @@ def verify_test_rank_and_basis(test_cases: list[dict]):
     warnings.simplefilter("ignore", UserWarning)
     
     # Hàm test này kiểm tra hạng, số chiều của không gian nghiệm và cơ sở không gian nghiệm
+    cfg.AutoTestReporter.print_header("KIỂM THỬ HẠNG VÀ CƠ SỞ")
     passed_count = 0
     total_count = len(test_cases)
 
@@ -99,15 +102,15 @@ def verify_test_rank_and_basis(test_cases: list[dict]):
             if case.get("null_is_empty"):
                 assert len(n_basis) == 0, "Không gian nghiệm lẽ ra phải rỗng"
                 
-            AutoTestReporter.print_result(case['Nội dung'], True)
+            cfg.AutoTestReporter.print_result(case['Nội dung'], True)
             passed_count += 1
             
         except AssertionError as err:
-            AutoTestReporter.print_result(case['Nội dung'], False, f"(Assertion: {err})")
+            cfg.AutoTestReporter.print_result(case['Nội dung'], False, f"(Assertion: {err})")
         except Exception as err:
-            AutoTestReporter.print_result(case['Nội dung'], False, f"(Lỗi Runtime: {err})")
+            cfg.AutoTestReporter.print_result(case['Nội dung'], False, f"(Lỗi Runtime: {err})")
             
-    AutoTestReporter.print_summary(passed_count, total_count)
+    cfg.AutoTestReporter.print_summary(passed_count, total_count)
 
 if __name__ == "__main__":
     from test_case import RANK_BASIS_TEST_CASES

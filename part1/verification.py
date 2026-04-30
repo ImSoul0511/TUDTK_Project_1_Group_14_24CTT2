@@ -1,21 +1,18 @@
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np
-import config
-
-
+import config as cfg
 
 def verify_solution(A, b, x_custom):
     """
-    Kiểm chứng kết quả bằng NumPy
-
+    Kiểm tra nghiệm của hệ phương trình Ax=b so với numpy.
     Args:
-        A: Ma trận hệ số
-        b: Vector vế phải
-        x_custom: nghiệm
-    
-    Return:
-        True: Kết quả của bạn Khớp
-        False: Kết quả của bạn Sai
-
+        A: Ma trận hệ số.
+        b: Vector vế phải.
+        x_custom: Nghiệm tính bởi thuật toán custom.
+    Returns:
+        bool: True nếu nghiệm khớp, False nếu không.
     """
     # Xử lý kiểm tra cho trường hợp hệ vô số nghiệm / vô nghiệm (x là chuỗi hoặc x = None)
     if isinstance(x_custom, str) or x_custom is None:
@@ -35,15 +32,12 @@ def verify_solution(A, b, x_custom):
 
 def verify_determinant_numpy(matrix_A, custom_det):
     """
-    Kiểm chứng kết quả định thức bằng NumPy
-
+    Kiểm tra định thức so với numpy.
     Args:
-        matrix_A: Ma trận hệ số
-        custom_det: Giá trị định thức
-    
+        matrix_A: Ma trận đầu vào.
+        custom_det: Định thức tính bởi thuật toán custom.
     Returns:
-        True: Nếu trùng khớp
-        False: Nếu không trùng khớp
+        bool: True nếu khớp.
     """
     if not matrix_A:
         return custom_det == 0.0
@@ -57,25 +51,22 @@ def verify_determinant_numpy(matrix_A, custom_det):
 
 def verify_inverse_numpy(matrix_A, inverse_A):
     """
-    Kiểm chứng AA^-1 = I và so sánh kết quả với NumPy.
-
+    Kiểm tra ma trận nghịch đảo so với numpy.
     Args:
-        matrix_A: Ma trận hệ số
-        inverse_A: Ma trận nghịch đảo
-    
+        matrix_A: Ma trận đầu vào.
+        inverse_A: Ma trận nghịch đảo custom.
     Returns:
-        True: Nếu tích AA^{-1} ra đúng ma trận đơn vị
-        False: Nếu tích ra sai
+        bool: True nếu khớp.
     """
     # Kiểm tra xem inverse_A có tồn tại không (tránh lỗi khi hàm inverse tạch)
     if inverse_A is None:
         det_A = np.linalg.det(np.array(matrix_A, dtype=float))
-        if config.is_zero(det_A): 
+        if cfg.is_zero(det_A): 
             return True 
         else:
             return False 
         
-    # 1. Kiểm tra kích thước trước khi tính toán để tránh lỗi Broadcast
+    # Kiểm tra kích thước trước khi tính toán để tránh lỗi Broadcast
     rows_A = len(matrix_A)
     cols_A = len(matrix_A[0])
     rows_inv = len(inverse_A)
@@ -89,7 +80,7 @@ def verify_inverse_numpy(matrix_A, inverse_A):
     inv_custom_np = np.array(inverse_A, dtype=float)
     n = len(matrix_A)
 
-    # 1. Kiểm tra điều kiện AA^-1 = I
+    # Kiểm tra điều kiện AA^-1 = I
     # Tính tích A * A^-1
     identity_check = np.dot(A_np, inv_custom_np)
     I_matrix = np.eye(n)
@@ -97,7 +88,7 @@ def verify_inverse_numpy(matrix_A, inverse_A):
     # Kiểm tra xem tích có xấp xỉ ma trận đơn vị không
     is_identity = np.allclose(identity_check, I_matrix)
 
-    # 2. So sánh trực tiếp với kết quả của NumPy
+    # So sánh trực tiếp với kết quả của NumPy
     try:
         inv_numpy = np.linalg.inv(A_np)
         matches_numpy = np.allclose(inv_custom_np, inv_numpy)
@@ -108,19 +99,15 @@ def verify_inverse_numpy(matrix_A, inverse_A):
 
 def verify_rank_and_basis_numpy(A, rank_custom, row_basis, col_basis, null_basis):
     """
-    Kiểm chứng  hạng và cơ sở của không gian dòng, không gian cột, 
-    và không gian nghiệm bằng Numpy
-
+    Kiểm tra hạng và không gian con so với numpy/sympy.
     Args:
-        A: Ma trận hệ số
-        rank_custom: Hạng ma trận
-        row_basis: cơ sở không gian dòng
-        col_basis: Cơ sở không gian cột
-        null_basis: Cơ sở không gian nghiệm
-    
+        A: Ma trận đầu vào.
+        rank_custom: Hạng custom.
+        row_basis: Cơ sở hàng custom.
+        col_basis: Cơ sở cột custom.
+        null_basis: Cơ sở null custom.
     Returns:
-        True: Nếu trùng khớp
-        False: Nếu không trùng khớp
+        bool: True nếu khớp.
     """
     A_np = np.array(A, dtype=float)
     rows, cols = A_np.shape
@@ -151,7 +138,7 @@ def verify_rank_and_basis_numpy(A, rank_custom, row_basis, col_basis, null_basis
         check_null = False
     else:
         for v in null_basis:
-            if not np.allclose(np.dot(A_np, np.array(v)), 0, atol=config.EPSILON):
+            if not np.allclose(np.dot(A_np, np.array(v)), 0, atol=cfg.EPSILON):
                 check_null = False
                 break
 
@@ -160,13 +147,17 @@ def verify_rank_and_basis_numpy(A, rank_custom, row_basis, col_basis, null_basis
 
 def verify_test_verify_solution(test_cases: list[dict]): 
     """
-    Hàm tự kiểm thử (Self-test) cho chính hàm verify_solution.
-    Nó dùng Numpy làm 'trọng tài' để xác nhận hàm verify của chúng ta báo đúng hay sai.
+    Kiểm thử các hàm verify.
+    Args:
+        test_cases: Danh sách các bộ test.
+    Returns:
+        None
     """
     import numpy as np
     from config import AutoTestReporter
     passed_count = 0
     total_count = len(test_cases)
+    cfg.AutoTestReporter.print_header("KIỂM THỬ NGHIỆM BẰNG NUMPY")
 
     for case in test_cases:
         e = verify_solution(case['A'], case['b'], case['x'])
@@ -204,5 +195,5 @@ def verify_test_verify_solution(test_cases: list[dict]):
 
 if __name__ == "__main__":
     from test_case import *
-    verify_solution(VERIFY_SOLUTION_TEST_CASES)
+    verify_test_verify_solution(VERIFY_SOLUTION_TEST_CASES)
  

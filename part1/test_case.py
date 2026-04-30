@@ -1,6 +1,6 @@
 
 # ----------------------------------------------------------------------------
-# 1. TEST CASES: BACK SUBSTITUTION (THẾ NGƯỢC)
+# TEST CASES: BACK SUBSTITUTION (THẾ NGƯỢC)
 # ----------------------------------------------------------------------------
 BACK_SUBSTITUTION_TEST_CASES = [
     {
@@ -47,7 +47,7 @@ BACK_SUBSTITUTION_TEST_CASES = [
 ]
 
 # ----------------------------------------------------------------------------
-# 2. TEST CASES: expected_answer (DETERMINANT)
+# TEST CASES: expected_answer (DETERMINANT)
 # ----------------------------------------------------------------------------
 DETERMINANT_TEST_CASES = [
     {
@@ -93,7 +93,7 @@ DETERMINANT_TEST_CASES = [
 ]
 
 # ----------------------------------------------------------------------------
-# 3. TEST CASES: KHỬ GAUSS (GAUSSIAN ELIMINATION)
+# TEST CASES: KHỬ GAUSS (GAUSSIAN ELIMINATION)
 # ----------------------------------------------------------------------------
 GAUSSIAN_ELIMINATE_TEST_CASES = [
     {
@@ -144,7 +144,7 @@ GAUSSIAN_ELIMINATE_TEST_CASES = [
 ]
 
 # ----------------------------------------------------------------------------
-# 4. TEST CASES: MA TRẬN NGHỊCH ĐẢO (INVERSE)
+# TEST CASES: MA TRẬN NGHỊCH ĐẢO (INVERSE)
 # ----------------------------------------------------------------------------
 INVERSE_TEST_CASES = [
     {
@@ -175,7 +175,7 @@ INVERSE_TEST_CASES = [
 ]
 
 # ----------------------------------------------------------------------------
-# 5. TEST CASES: HẠNG VÀ CƠ SỞ (RANK & BASIS)
+# TEST CASES: HẠNG VÀ CƠ SỞ (RANK & BASIS)
 # ----------------------------------------------------------------------------
 RANK_BASIS_TEST_CASES = [
     {
@@ -239,7 +239,7 @@ RANK_BASIS_TEST_CASES = [
 ]
 
 # ----------------------------------------------------------------------------
-# 6. TEST CASES: KIỂM CHỨNG NGHIỆM (VERIFY SOLUTION)
+# TEST CASES: KIỂM CHỨNG NGHIỆM (VERIFY SOLUTION)
 # ----------------------------------------------------------------------------
 VERIFY_SOLUTION_TEST_CASES = [
     {
@@ -267,5 +267,11 @@ VERIFY_SOLUTION_TEST_CASES = [
         "A": [[2.0, -1.0], [1.0, 1.0]], 
         "x": [0.0, 3.0], 
         "b": [-3.0, 3.0],
+    },
+    {
+        "Nội dung": "Nghiệm chênh lệch nhỏ",
+        "A": [[1.0, 1.0], [1.0, 1.0000000000001]],
+        "x": [1.0, 1.0],
+        "b": [2.0, 2.0000000000001]
     }
 ]
