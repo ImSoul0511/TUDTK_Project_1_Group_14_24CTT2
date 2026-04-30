@@ -6,11 +6,28 @@ import config
 import numpy as np
 
 def matrix_transpose(A):
-    """ Chuyển vị ma trận """
+    """
+    Tìm ma trận chuyển vị.
+
+    Args:
+        A: Ma trận đầu vào.
+
+    Returns:
+        list: Ma trận chuyển vị.
+    """
     return [[A[i][j] for i in range(len(A))] for j in range(len(A[0]))]
 
 def matrix_multiply(A, B):
-    """ Nhân hai ma trận """
+    """
+    Nhân hai ma trận.
+
+    Args:
+        A: Ma trận trái.
+        B: Ma trận phải.
+
+    Returns:
+        list: Ma trận kết quả.
+    """
     # Kiểm tra điều kiện nhân ma trận: cột A = hàng B
     try:
         m, n, p = len(A), len(A[0]), len(B[0])
@@ -26,23 +43,53 @@ def matrix_multiply(A, B):
     return result
 
 def vector_norm(v):
-    """ Tính độ dài Euclid của vector """
+    """
+    Tính chuẩn L2 của vector.
+
+    Args:
+        v: Vector đầu vào.
+
+    Returns:
+        float: Chuẩn L2 của vector.
+    """
     return math.sqrt(sum(x**2 for x in v))
 
 def dot_product(v1, v2):
     """
-    Tính tích vô hướng của hai vector
+    Tính tích vô hướng của hai vector.
+
+    Args:
+        v1: Vector 1.
+        v2: Vector 2.
+
+    Returns:
+        float: Tích vô hướng.
     """
     return sum(x * y for x, y in zip(v1, v2))
 
 def subtract_vectors(v1, v2, scalar):
     """
-    Trừ hai vector: v1 - (scalar * v2)
-    """ 
+    Trừ hai vector.
+
+    Args:
+        v1: Vector bị trừ.
+        v2: Vector trừ.
+
+    Returns:
+        list: Vector kết quả.
+    """
     return [x - (scalar * y) for x, y in zip(v1, v2)]
 
 def vector_normalize(v):
-    """ Chuẩn hóa vector """
+    """
+    Chuẩn hóa vector.
+
+    Args:
+        v: Vector đầu vào.
+
+    Returns:
+        list: Vector đã chuẩn hóa.
+    """
     norm = vector_norm(v)
     if config.is_zero(norm): return v
     return [x / norm for x in v]
@@ -63,8 +110,15 @@ def get_col_slice(M, j, start_row):
 
 def find_orthogonal_u(existing_vectors, dim):
     """
-    Tìm vector trực giao với tất cả các vector trong existing_vectors
-    theo thuật toán Gram-Schmidt
+    Tìm các vector trực chuẩn.
+
+    Args:
+        A: Ma trận đầu vào.
+        V: Ma trận V.
+        sigma_values: Các giá trị kỳ dị.
+
+    Returns:
+        list: Ma trận U.
     """
     # Thử lần lượt các vector đơn vị chuẩn: [1, 0, 0...], [0, 1, 0...]
     for i in range(dim):
@@ -178,7 +232,16 @@ def orthogonal_matrix(eigenvectors):
     return Q 
     
 def matrix_sub_lambda_I(A, lam):
-    """Tính ma trận (A - λI)"""
+    """
+    Trừ ma trận cho lambda * I.
+
+    Args:
+        A: Ma trận đầu vào.
+        lam: Giá trị lambda.
+
+    Returns:
+        list: Ma trận kết quả.
+    """
     n = len(A)
     res = copy_matrix(A)
     for i in range(n):
@@ -186,25 +249,69 @@ def matrix_sub_lambda_I(A, lam):
     return res
 
 def _mat_max_abs_diff(A, B):
-    """Tính sai số tuyệt đối lớn nhất giữa 2 ma trận (list of lists)."""
+    """
+    Tìm sai số tuyệt đối lớn nhất giữa 2 ma trận.
+
+    Args:
+        A: Ma trận 1.
+        B: Ma trận 2.
+
+    Returns:
+        float: Sai số.
+    """
     A_np = np.array(A, dtype=float)
     B_np = np.array(B, dtype=float)
     return float(np.max(np.abs(A_np - B_np)))
 
 def _frobenius_error(A, B):
-    """Tính chuẩn Frobenius của hiệu |A - B|_F."""
+    """
+    Tính sai số Frobenius.
+
+    Args:
+        A: Ma trận 1.
+        B: Ma trận 2.
+
+    Returns:
+        float: Sai số Frobenius.
+    """
     A_np = np.array(A, dtype=float)
     B_np = np.array(B, dtype=float)
     return float(np.linalg.norm(A_np - B_np, 'fro'))
 
 def _mat_multiply_np(A, B):
-    """Nhân 2 ma trận (list of lists) → list of lists dùng numpy."""
+    """
+    Nhân ma trận bằng numpy.
+
+    Args:
+        A: Ma trận trái.
+        B: Ma trận phải.
+
+    Returns:
+        ndarray: Ma trận kết quả.
+    """
     return np.dot(np.array(A, dtype=float), np.array(B, dtype=float)).tolist()
 
 def _identity_np(n):
-    """Trả về ma trận đơn vị nxn dạng list of lists."""
+    """
+    Tạo ma trận đơn vị bằng numpy.
+
+    Args:
+        n: Kích thước.
+
+    Returns:
+        ndarray: Ma trận đơn vị.
+    """
     return np.eye(n).tolist()
 
 def _sort_eigenvalues(vals):
-    """Sắp xếp danh sách trị riêng thực theo thứ tự giảm dần để so sánh."""
+    """
+    Sắp xếp trị riêng giảm dần.
+
+    Args:
+        eigenvalues: Danh sách trị riêng.
+        eigenvectors: Danh sách vector riêng tương ứng.
+
+    Returns:
+        tuple: Trị riêng và vector riêng đã sắp xếp.
+    """
     return sorted([float(v) for v in vals], reverse=True)

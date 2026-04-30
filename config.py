@@ -1,11 +1,27 @@
-from IPython.display import display, Markdown
-
 EPSILON = 1e-15
 
 def is_zero(x):
+    """
+    Kiểm tra một số có gần bằng 0 hay không dựa trên giá trị EPSILON.
+
+    Args:
+        x: Giá trị cần kiểm tra.
+
+    Returns:
+        bool: True nếu x coi như bằng 0, ngược lại False.
+    """
     return abs(x) < EPSILON
 
 def make_zero(x):
+    """
+    Làm tròn một số về 0.0 nếu nó được coi là số 0.
+
+    Args:
+        x: Giá trị đầu vào.
+
+    Returns:
+        float: 0.0 nếu là số 0, ngược lại trả về chính nó.
+    """
     return 0.0 if is_zero(x) else x
 
 class AutoTestReporter:
@@ -17,7 +33,13 @@ class AutoTestReporter:
     @classmethod
     def print_header(cls, title: str):
         """
-        In tiêu đề của phần kiểm thử.
+        In tiêu đề phần kiểm thử.
+
+        Args:
+            title: Tên tiêu đề.
+
+        Returns:
+            None
         """
         print(cls.minus_sign)
         print(title)
@@ -26,8 +48,15 @@ class AutoTestReporter:
     @classmethod
     def print_result(cls, test_name: str, passed: bool, details: str = ""):
         """
-        In kết quả Pass/Fail của một test case. 
-        Tự động căn lề để hộp trạng thái nằm thẳng hàng.
+        In kết quả của một ca kiểm thử.
+
+        Args:
+            test_name: Tên của ca kiểm thử.
+            passed: Trạng thái thành công hay thất bại.
+            details: Thông tin chi tiết (tùy chọn).
+
+        Returns:
+            None
         """
         max_len = 70
         
@@ -48,7 +77,14 @@ class AutoTestReporter:
     @classmethod
     def print_summary(cls, passed_count: int, total_count: int):
         """
-        In ra dòng tổng kết: Số test thành công / Tổng số test, tỷ lệ % và nhận xét.
+        In tổng kết quả sau khi chạy xong tất cả kiểm thử.
+
+        Args:
+            passed_count: Số ca kiểm thử thành công.
+            total_count: Tổng số ca kiểm thử.
+
+        Returns:
+            None
         """
         if total_count == 0:
             print(cls.minus_sign)

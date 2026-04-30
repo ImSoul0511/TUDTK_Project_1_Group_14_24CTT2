@@ -8,6 +8,15 @@ from decomposition import run_svd_tests
 from diagonalization import run_diagonalize_tests
 
 def run_all_tests():
+    """
+    Chạy tất cả các unit test.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     run_svd_tests(SVD_TEST_CASES)
     run_diagonalize_tests(DIAGONALIZATION_TEST_CASES)
     

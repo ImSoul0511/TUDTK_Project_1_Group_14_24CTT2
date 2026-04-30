@@ -10,6 +10,15 @@ from rank_basis import verify_test_rank_and_basis
 
 
 def run_all_tests():
+    """
+    Chạy tất cả các unit test.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     verify_test_back_substitution(BACK_SUBSTITUTION_TEST_CASES)
     verify_test_gaussian_eliminate(GAUSSIAN_ELIMINATE_TEST_CASES)
     verify_test_inverse(INVERSE_TEST_CASES)

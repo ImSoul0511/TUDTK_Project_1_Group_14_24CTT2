@@ -2,7 +2,15 @@ import numpy as np
 
 # --- HÀM BỔ TRỢ TÍNH GIÁ TRỊ THAM CHIẾU ---
 def get_expected_sigmas(A):
-    """Sử dụng numpy để tính các giá trị kỳ dị (sigmas) tham chiếu."""
+    """
+    Lấy các giá trị kỳ dị kỳ vọng từ cấu hình.
+
+    Args:
+        None
+
+    Returns:
+        list: Danh sách giá trị kỳ dị.
+    """
     _, s, _ = np.linalg.svd(A)
     return s.tolist()
 # ----------------------------------------------------------------------------

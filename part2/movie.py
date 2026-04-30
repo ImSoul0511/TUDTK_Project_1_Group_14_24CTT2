@@ -1,6 +1,15 @@
 from moviepy import VideoFileClip, concatenate_videoclips
 
 def main():
+    """
+    Chạy kịch bản ghép video.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     # Đường dẫn tới các file mp4 1080p60 đã render xong
     clip1 = VideoFileClip("media/videos/manim_scene_1/1080p60/Scene_1.mp4")
     clip2 = VideoFileClip("media/videos/manim_scene_1/1080p60/Scene_2.mp4")

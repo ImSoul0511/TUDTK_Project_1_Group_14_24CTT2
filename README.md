@@ -44,20 +44,21 @@ Singular-Value-Decomposition/
 │   ├── rank_basis.py               # Tính hạng & các không gian con
 │   ├── verification.py             # Hệ thống kiểm chứng (NumPy)
 │   ├── test_case.py                # Dữ liệu kiểm thử mẫu
+│   ├── run_all_test.py             # Chạy tất cả các test
 │   └── part1_demo.ipynb            # Notebook trình diễn Part 1
 ├── part2/                          # Chéo hóa & SVD
 │   ├── __init__.py                 # Khai báo package Part 2
+│   ├── diagonalization.py          # Thuật toán chéo hóa
 │   ├── decomposition.py            # Cài đặt SVD Scratch
-│   ├── diagonalization.py          # Thuật toán Jacobi & QR
-│   ├── verification_part2.py       # Kiểm chứng Part 2 bằng NumPy
-│   ├── test_case_part2.py          # Dữ liệu kiểm thử Part 2
+│   ├── verification.py             # Kiểm chứng Part 2 bằng NumPy
+│   ├── test_case.py                # Dữ liệu kiểm thử mẫu  
+│   ├── run_all_test.py             # Chạy tất cả các test
 │   ├── utils.py                    # Tiện ích toán học cho Part 2
 │   ├── manim_scene_1.py            # Cảnh 1: Thuật toán chéo hóa và trực quan hóa 
 │   ├── manim_scene_2.py            # Cảnh 2: Ma trận Sigma trong SVD
 │   ├── manim_scene_3.py            # Cảnh 3: Ma trận U và V^T trong SVD
 │   ├── manim_scene_4.py            # Cảnh 4: Thuật toán SVD và trực quan hóa
 │   ├── manim_scene_5.py            # Cảnh 5: Ứng dụng nén ảnh của SVD
-│   ├── data.json                   # Dữ liệu cấu hình phụ cho Manim
 │   └── movie.py                    # Script ghép nối video Manim
 ├── part3/                          # Benchmark & Thực nghiệm
 │   ├── __init__.py                 # Khai báo package Part 3
@@ -128,16 +129,16 @@ Triển khai các phương pháp tìm trị riêng và giá trị kỳ dị.
 | **Module** | **Hàm chính** | **Mô tả** |
 | :--- | :--- | :--- |
 | `diagonalization.py` | `diagonalize` | Tìm toàn bộ trị riêng bằng phương pháp Jacobi (đối xứng) hoặc QR Iteration (tổng quát). |
-| `decomposition.py` | `svd(A)` | Toàn bộ tiến trình phân rã SVD (A = UΣVᵀ) từ trị riêng của $A^TA$. |
-| `verification_part2.py` | `verify_svd_numpy`, `verify_diagonalize_numpy` | Kiểm chứng kết quả thuật toán phân rã với NumPy. |
-| `test_case_part2.py` | `SVD_TEST_CASES`, `DIAGONALIZATION_TEST_CASES` | Các bộ dữ liệu mẫu dùng để kiểm thử phần 2. |
+| `decomposition.py` | `svd` | Toàn bộ tiến trình phân rã SVD (A = UΣVᵀ) từ trị riêng của $A^TA$. |
+| `verification.py` | `verify_svd_numpy`, `verify_diagonalize_numpy` | Kiểm chứng kết quả thuật toán phân rã với NumPy. |
+| `test_case.py` | `SVD_TEST_CASES`, `DIAGONALIZATION_TEST_CASES` | Các bộ dữ liệu mẫu dùng để kiểm thử phần 2. |
 | `utils.py` | `matrix_multiply`, `vector_normalize`, v.v. | Thư viện hỗ trợ tính toán ma trận, tích vô hướng và trực giao hóa Gram-Schmidt. |
-| `manim_scene_1.py` | `Scene` | Cảnh 1: Giải phẫu sự hỗn loạn (Anatomy of Chaos). |
-| `manim_scene_2.py` | `Scene2`, `Scene2_3D` | Cảnh 2: Trực quan hóa hình học 2D/3D & ma trận Sigma. |
-| `manim_scene_3.py` | `Scene3`, `Rotation` | Cảnh 3: Thuật toán và Toán học phía sau SVD. |
-| `manim_scene_4.py` | `Scene4_SVD` | Cảnh 4: So sánh SVD vs Chéo hóa (Diagonalization). |
-| `data.json` | `JSON` | File chứa một số tham số cấu hình tĩnh cho Manim. |
-| `movie.py` | `concatenate_videoclips` | Script hậu kỳ ghép nối các cảnh quay thành video demo hoàn chỉnh. |
+| `manim_scene_1.py` | `Scene_1, Scene_2` | Thuật toán chéo hóa ma trận và trực quan hóa. |
+| `manim_scene_2.py` | `Scene_3, Scene_4, Scene_5` | Trực quan hóa ma trận Sigma trong phân rã SVD. |
+| `manim_scene_3.py` | `Scene_6, Scene_7, Scene_8` | Trực quan hóa ma trận U và ma trận V^T trong phân rã SVD. |
+| `manim_scene_4.py` | `Scene_9, Scene_10, Scene_11` | Thuật toán phân rã SVD và trực quan hóa. |
+| `manim_scene_5.py` | `Scene_12, Scene_13` | Ứng dụng SVD trong nén ảnh. |
+| `movie.py` | `concatenate_videoclips` | Script ghép nối các cảnh quay thành video demo hoàn chỉnh. |
 
 **Chi tiết giải thuật Phân rã:**
 - **Jacobi Method:** Thực hiện các phép quay Givens liên tiếp để triệt tiêu các phần tử ngoại biên, đưa ma trận đối xứng về dạng đường chéo.
@@ -209,11 +210,7 @@ Tiến hành cài đặt danh sách các thư viện (NumPy, Manim, Matplotlib..
 ```bash
 pip install -r requirements.txt
 ```
-
-> **Lưu ý quan trọng:** Bạn chỉ cần thực hiện bước 1 và 3 trong lần đầu tiên tải dự án về. Tuy nhiên, mỗi khi mở một Terminal mới để làm việc, bạn **bắt buộc phải thực hiện bước 2** để kích hoạt lại môi trường ảo.
-
 ---
-
 
 ## **Cách chạy thử nghiệm**
 

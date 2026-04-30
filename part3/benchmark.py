@@ -4,9 +4,9 @@ import sys, os
 import numpy as np
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from part3.utils import compute_l2_error
-from part3.solvers import solve_system
-from part3.generate_data import generate_random_system, generate_hilbert_matrix, generate_spd_matrix, calculate_condition_number
+from utils import compute_l2_error
+from solvers import solve_system
+from generate_data import generate_random_system, generate_hilbert_matrix, generate_spd_matrix, calculate_condition_number
 
 def measure_execution_metrics():
     """

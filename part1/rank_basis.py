@@ -83,6 +83,15 @@ def rank_and_basis(matrix_A):
     return rank_matrix, row_space_basis, col_space_basis, null_space_basis
 
 def verify_test_rank_and_basis(test_cases: list[dict]):
+    """
+    Kiểm thử hàm tính hạng và cơ sở.
+
+    Args:
+        test_cases: Danh sách ca kiểm thử.
+
+    Returns:
+        None
+    """
     import warnings
     warnings.simplefilter("ignore", UserWarning)
     

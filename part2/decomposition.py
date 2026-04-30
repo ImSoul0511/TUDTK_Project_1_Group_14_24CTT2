@@ -171,13 +171,13 @@ def householder_qr_v1(A):
 
 def run_svd_tests(test_cases: list[dict]):
     """
-    Chạy toàn bộ test cases cho thuật toán SVD tự cài đặt.
+    Chạy kiểm thử cho thuật toán SVD.
 
-    Với mỗi test case sẽ in:
-      - Tên test case
-      - Trạng thái PASS / FAIL
-      - Sai số tái tạo, sai số trực giao U, sai số trực giao Vt
-      - (Nếu có expected_sigmas) Sai số so với numpy
+    Args:
+        test_cases: Danh sách ca kiểm thử.
+
+    Returns:
+        None
     """
     AutoTestReporter.print_header("KIỂM CHỨNG THUẬT TOÁN: SVD (Singular Value Decomposition) — Tự cài đặt vs NumPy")
 

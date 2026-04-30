@@ -13,8 +13,14 @@ from part1.gaussian import gaussian_eliminate
 # Dùng thuật toán Jacobi để tìm toàn bộ vector riêng 
 def eigen_calculation_with_jacobi(M, iterations=100):
     """
-    Sử dụng phương pháp xoay Jacobi để 'chéo hóa' ma trận đối xứng M.
-    Đây là cách máy tính thay thế việc giải phương trình det(M - lambda*I) = 0.
+    Sử dụng phương pháp xoay Jacobi để tìm giá trị riêng và vector riêng của ma trận đối xứng. 
+    
+    Args:
+        M: Ma trận đầu vào (đối xứng).
+        iterations: Số vòng lặp tối đa.
+        
+    Returns:
+        tuple: Giá trị riêng và vector riêng tương ứng.
     """
     n = len(M)
     # V ban đầu là ma trận đơn vị, sau này sẽ chứa các vector riêng (eigenvectors)
@@ -67,9 +73,15 @@ def eigen_calculation_with_jacobi(M, iterations=100):
 
 def eigen_calculation_reverse_iteration(A, max_iterations=500, tol=1e-7):
     """
-    Tính toán Trị riêng và Vector riêng thông qua 2 bước:
-    1. Dùng QR phân rã để tìm các Trị riêng xấp xỉ.
-    2. Dùng Inverse Iteration (Lặp ngược) để tìm Vector riêng và làm mịn Trị riêng.
+    Sử dụng thuật toán phân rã QR kết hợp phép lặp ngược để tìm trị riêng và vector riêng của ma trận.
+    
+    Args:
+        A: Ma trận đầu vào.
+        max_iterations: Số vòng lặp QR tối đa.
+        tol: Dung sai hội tụ.
+        
+    Returns:
+        tuple: Giá trị riêng và ma trận vector riêng.
     """
     from part2.decomposition import householder_qr_v1
     
@@ -103,6 +115,16 @@ def eigen_calculation_reverse_iteration(A, max_iterations=500, tol=1e-7):
 
     # Hàm helper thực hiện lặp ngược cho từng nhóm trị riêng
     def _inverse_iteration(lam_approx, multiplicity):
+        """
+        Hàm phụ trợ lặp ngược để tìm vector riêng cho trị riêng đã biết.
+        
+        Args:
+            lam_approx: Trị riêng xấp xỉ.
+            multiplicity: Bội số của trị riêng.
+            
+        Returns:
+            list: Các vector riêng trực giao.
+        """
         eps = 1e-10
         B = ut.matrix_sub_lambda_I(A, lam_approx + eps)
         
@@ -160,14 +182,13 @@ def eigen_calculation_reverse_iteration(A, max_iterations=500, tol=1e-7):
 
 def diagonalize(A):
     """
-    Thực hiện chéo hóa ma trận A = PDP^-1 bằng thuật toán lặp QR.
+    Chéo hóa ma trận vuông.
+    
+    Args:
+        A: Ma trận vuông cần chéo hóa.
+        
     Returns:
-        P: Ma trận các vector riêng (cột)
-        D: Ma trận đường chéo chứa các giá trị riêng
-        P_inv: Ma trận nghịch đảo của P
-    Raises:
-        ValueError: Nếu A không phải ma trận vuông.
-        ValueError: Nếu A không thể chéo hóa (ma trận thiếu hụt - P suy biến).
+        tuple: Ma trận P, ma trận đường chéo D, ma trận P^-1.
     """
     # Kiểm tra ma trận vuông
     n = len(A)
@@ -197,13 +218,13 @@ def diagonalize(A):
 
 def run_diagonalize_tests(test_cases: list[dict]):
     """
-    Chạy toàn bộ test cases cho thuật toán Chéo hóa lặp QR tự cài đặt.
-
-    Với mỗi test case sẽ in:
-      - Tên test case
-      - Trạng thái PASS / FAIL
-      - Sai số tái tạo A = P*D*P_inv
-      - Sai số trị riêng so với numpy (max absolute error)
+    Chạy kiểm thử cho hàm chéo hóa.
+    
+    Args:
+        test_cases: Danh sách các ca kiểm thử.
+        
+    Returns:
+        None
     """
     AutoTestReporter.print_header("KIỂM CHỨNG THUẬT TOÁN: Chéo hóa (diagonalize) — Tự cài đặt vs NumPy")
 
