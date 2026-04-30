@@ -2,11 +2,13 @@
 
 > **Môn học:** Toán ứng dụng và thống kê (Applied Mathematics and Statistics)  
 > **GVHD:** ThS. Lê Nhựt Nam, ThS. Võ Nam Thục Đoan   
-> **Nhóm thực h## **Mục lục**
+> **Nhóm thực hiện:** Nhóm 14 (24CTT2)
+
+## **Mục lục**
 
 1. **[Tổng quan dự án](#tổng-quan-dự-án)**
 2. **[Cấu trúc thư mục](#cấu-trúc-thư-mục)**
-3. **[Cơ sở lý thuyết](#cơ-sở-lý-thuyết)**
+3. **[Cơ sở lý thuyết](#cơ-sở-lý-thuyết)**
 4. **[Chi tiết các phần thực hiện](#chi-tiết-các-phần-thực-hiện)**
     - [Phần 1: Nền tảng Đại số](#phần-1-nền-tảng-đại-số)
     - [Phần 2: Chéo hóa & Phân rã SVD](#phần-2-chéo-hóa--phân-rã-svd)
@@ -45,11 +47,14 @@ Singular-Value-Decomposition/
 ├── part2/                          # Chéo hóa & SVD
 │   ├── decomposition.py             # Cài đặt SVD Scratch
 │   ├── diagonalization.py           # Thuật toán Jacobi & QR
+│   ├── verification_part2.py        # Kiểm chứng Part 2 bằng NumPy
+│   ├── test_case_part2.py           # Dữ liệu kiểm thử Part 2
 │   ├── utils.py                     # Tiện ích toán học cho Part 2
 │   ├── manim_scene_1.py             # Cảnh 1: Giải phẫu sự hỗn loạn
 │   ├── manim_scene_2.py             # Cảnh 2: Trực quan hóa 2D/3D & Sigma
 │   ├── manim_scene_3.py             # Cảnh 3: Thuật toán & Toán học SVD
 │   ├── manim_scene_4.py             # Cảnh 4: SVD vs Diagonalization
+│   ├── data.json                    # Dữ liệu cấu hình phụ cho Manim
 │   └── movie.py                     # Script ghép nối video Manim
 ├── part3/                          # Benchmark & Thực nghiệm
 │   ├── benchmark.py                 # Thực nghiệm hiệu năng & ổn định
@@ -120,11 +125,14 @@ Triển khai các phương pháp tìm trị riêng và giá trị kỳ dị.
 | :--- | :--- | :--- |
 | `diagonalization.py` | `diagonalize` | Tìm toàn bộ trị riêng bằng phương pháp Jacobi (đối xứng) hoặc QR Iteration (tổng quát). |
 | `decomposition.py` | `svd(A)` | Toàn bộ tiến trình phân rã SVD (A = UΣVᵀ) từ trị riêng của $A^TA$. |
+| `verification_part2.py` | `verify_svd_numpy`, `verify_diagonalize_numpy` | Kiểm chứng kết quả thuật toán phân rã với NumPy. |
+| `test_case_part2.py` | `SVD_TEST_CASES`, `DIAGONALIZATION_TEST_CASES` | Các bộ dữ liệu mẫu dùng để kiểm thử phần 2. |
 | `utils.py` | `matrix_multiply`, `vector_normalize`, v.v. | Thư viện hỗ trợ tính toán ma trận, tích vô hướng và trực giao hóa Gram-Schmidt. |
 | `manim_scene_1.py` | `Scene` | Cảnh 1: Giải phẫu sự hỗn loạn (Anatomy of Chaos). |
 | `manim_scene_2.py` | `Scene2`, `Scene2_3D` | Cảnh 2: Trực quan hóa hình học 2D/3D & ma trận Sigma. |
 | `manim_scene_3.py` | `Scene3`, `Rotation` | Cảnh 3: Thuật toán và Toán học phía sau SVD. |
 | `manim_scene_4.py` | `Scene4_SVD` | Cảnh 4: So sánh SVD vs Chéo hóa (Diagonalization). |
+| `data.json` | `JSON` | File chứa một số tham số cấu hình tĩnh cho Manim. |
 | `movie.py` | `concatenate_videoclips` | Script hậu kỳ ghép nối các cảnh quay thành video demo hoàn chỉnh. |
 
 **Chi tiết giải thuật Phân rã:**
@@ -203,15 +211,56 @@ pip install -r requirements.txt
 ---
 
 
+## **Cách chạy thử nghiệm**
+
+Để kiểm chứng và chạy thử nghiệm các thành phần của dự án, bạn có thể chạy các script Python và Jupyter Notebook tương ứng cho từng phần. Đảm bảo bạn đã **kích hoạt môi trường ảo** (như hướng dẫn ở trên) trước khi chạy bất kỳ lệnh nào.
+
+### **Phần 1: Nền tảng Đại số**
+Mỗi thuật toán đều được tích hợp sẵn các bộ Test Case (lấy từ `part1/test_case.py`). Bạn có thể chạy kiểm thử từng module riêng lẻ:
+```bash
+python part1/gaussian.py
+python part1/determinant.py
+python part1/inverse.py
+python part1/rank_basis.py
+```
+Hoặc mở file `part1/part1_demo.ipynb` bằng Jupyter Notebook/VSCode để xem phần trình diễn từng bước.
+
+### **Phần 2: Chéo hóa & Phân rã SVD (Trực quan hóa Manim)**
+**1. Kiểm thử thuật toán phân rã:**
+Tương tự Phần 1, bạn có thể chạy kiểm thử các thuật toán phân rã và tìm trị riêng trực tiếp:
+```bash
+python part2/diagonalization.py
+python part2/decomposition.py
+```
+
+**2. Video Manim:**
+Link video:
+```
+
+```
+
+### **Phần 3: Benchmark & Phân tích ổn định**
+Để chạy tập dữ liệu thực nghiệm đo lường hiệu năng (thời gian chạy) và độ ổn định:
+```bash
+python part3/benchmark.py
+```
+Kết quả thực nghiệm thô sẽ được tự động lưu vào file `part3/benchmark_results.json`.
+
+Sau đó, hãy mở file Jupyter Notebook `part3/analysis.ipynb` để xem đồ thị phân tích chi tiết:
+- Đồ thị Log-Log về tốc độ thực thi O(n³).
+- Đồ thị so sánh độ chính xác giải hệ phương trình khi số điều kiện (Condition Number) tăng cao trên ma trận nhiễu.
+
+---
+
 ## **Tác giả & Đóng góp**
 
 | **MSSV** | **Họ và Tên** | **GitHub** |
 | :--- | :--- | :--- |
-| 24120394 | Nguyễn Đặng Khôi Nguyên | [@ImSoul0511](https://github.com/ImSoul0511) |
-| 24120331 | Lê Quốc Khải | [@QuocKhai](https://github.com/QuocKhai1004) |
-| 24120384 | Phan Nhật Minh | [@MintFan1607](https://github.com/MintFan1607) |
-| 24120370 | Trần Thị Lợi | [@Lowen-here](https://github.com/Lowen-here) |
-| 24120474 | Trịnh Vỹ Triết| [@TrinhVyTriet](https://github.com/TrinhVyTriet)|
+| 24120394 | Nguyễn Đặng Khôi Nguyên | [@ImSoul0511](https://github.com/ImSoul0511) |
+| 24120331 | Lê Quốc Khải | [@QuocKhai](https://github.com/QuocKhai1004) |
+| 24120384 | Phan Nhật Minh | [@MintFan1607](https://github.com/MintFan1607) |
+| 24120370 | Trần Thị Lợi | [@Lowen-here](https://github.com/Lowen-here) |
+| 24120474 | Trịnh Vỹ Triết | [@TrinhVyTriet](https://github.com/TrinhVyTriet) |
 
 ---
 
